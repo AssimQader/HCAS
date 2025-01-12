@@ -41,7 +41,6 @@ namespace Health_Clinic_Appointment_System.Controllers
 
             try
             {
-                // Add a new patient
                 await _patientService.AddPatient(patientDto);
                 return RedirectToAction("Index");
             }

@@ -29,10 +29,9 @@
                     </nav>
                 </div>
                 <div class="col-2 d-flex justify-content-end">
-                    <a type="button" class="btn btn-primary btn-style-light d-flex align-items-center me-2" asp-action="Create">
-                        <i class="fa-solid fa-plus" style="margin-right:5px;"></i>
-                        Add New
-                    </a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+                        <i class="fa-solid fa-plus"></i> Add New Doctor
+                    </button>
                 </div>
             </div>
         </div>
@@ -89,11 +88,84 @@
     </div>
 </div>
 
+
+
+@* add doctor modal *@
+<div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addDoctorModalLabel">Add New Doctor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addDoctorForm" class="needs-validation" novalidate method="post" asp-controller="Doctor" asp-action="Create">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="FullName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="FullName" name="FullName" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="Email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="Email" name="Email" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="PhoneNumber" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+201061103073" min="11" required />
+                                <div class="invalid-feedback">
+                                    Invalid phone number format. Use international format (e.g., +201061103073).
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Specialization -->
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="Specialization" class="form-label">Specialization</label>
+                                <select class="form-select" id="Specialization" name="Specialization" required style="max-height: 150px; overflow-y: auto;">
+                                    <option value="" selected disabled>Select Specialization</option>
+                                    <option value="Cardiologist">Cardiologist</option>
+                                    <option value="Orthopedist">Orthopedist</option>
+                                    <option value="Nephrologist">Nephrologist</option>
+                                    <option value="Oncologist">Oncologist</option>
+                                    <option value="Pulmonologist">Pulmonologist</option>
+                                    <option value="Rheumatologist">Rheumatologist</option>
+                                    <option value="Urologist">Urologist</option>
+                                    <option value="Anesthesiologist">Anesthesiologist</option>
+                                    <option value="Pathologist">Pathologist</option>
+                                    <option value="Surgeon">Surgeon</option>
+                                    <option value="Plastic Surgeon">Plastic Surgeon</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a valid specialization.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Doctor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
 @section scripts {
     <script src="~/lib/dataTable/jquery.dataTables.js"></script>
-    @* <script src="~/js/TemplateManagement/index.js"></script> *@
+    <script src="~/js/patient/ModalInputsValidation.js"></script>
+
     <script>
-        $(function () {
+        $(function () 
+        {
             let table = new DataTable('#DoctorsTable', {
                 responsive: true
             });

@@ -29,10 +29,9 @@
                     </nav>
                 </div>
                 <div class="col-2 d-flex justify-content-end">
-                    <a type="button" class="btn btn-primary btn-style-light d-flex align-items-center me-2" asp-action="Create">
-                        <i class="fa-solid fa-plus" style="margin-right:5px;"></i>
-                        Add New
-                    </a>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+                        <i class="fa-solid fa-plus"></i> Add New Patient
+                    </button>
                 </div>
             </div>
         </div>
@@ -93,9 +92,73 @@
     </div>
 </div>
 
+
+@* add patient modal *@
+<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addPatientForm" class="needs-validation" novalidate method="post" asp-controller="Patient" asp-action="Create">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="FullName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="FullName" name="FullName" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="Email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="Email" name="Email" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="PhoneNumber" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+201061103073" min="11" required />
+                                <div class="invalid-feedback">
+                                    Invalid phone number format. Use international format (e.g., +201061103073).
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="DateOfBirth" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="DateOfBirth" name="DateOfBirth" required />
+                               
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="Gender" class="form-label">Gender</label>
+                                <select class="form-select" id="Gender" name="Gender" required>
+                                    <option value="" selected disabled>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Patient</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
 @section scripts {
     <script src="~/lib/dataTable/jquery.dataTables.js"></script>
-    @* <script src="~/js/TemplateManagement/index.js"></script> *@
+    <script src="~/js/patient/ModalInputsValidation.js"></script>
+
     <script>
         $(function () {
             let table = new DataTable('#PatientsTable', {
