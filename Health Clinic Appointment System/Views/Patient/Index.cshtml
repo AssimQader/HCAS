@@ -1,0 +1,184 @@
+﻿@using HCAS.DTO
+@model IEnumerable<PatientDto>
+@{
+    ViewData["Title"] = "Patients Management";
+}
+
+@section styles
+{
+    <link href="~/lib/dataTable/jquery.dataTables.css" rel="stylesheet" />
+    <style>
+
+    </style>
+}
+
+<div class="row mb-3">
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-10">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a asp-controller="Home" asp-action="Index">
+                                    <i class="fa-solid fa-house"></i>
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Patients Management</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-2 d-flex justify-content-end">
+                    <a type="button" class="btn btn-primary btn-style-light d-flex align-items-center me-2" asp-action="Create">
+                        <i class="fa-solid fa-plus" style="margin-right:5px;"></i>
+                        Add New
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="card">
+        <div class="card-body">
+            <table id="PatientsTable" class="display text-center" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th hidden>Id</th>
+                        <th style="text-align: center;">Name</th>
+                        <th style="text-align: center;">Email</th>
+                        <th style="text-align: center;">Phone Number</th>
+                        <th style="text-align: center;">Date Of Birth</th>
+                        <th style="text-align: center;">Gender</th>
+                        <th style="text-align: center;">Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td hidden>@item.ID</td>
+                            <td>
+                                @item.FullName
+                            </td>
+                            <td>
+                                @item.Email
+                            </td>
+                            <td>
+                                @item.PhoneNumber
+                            </td>
+                            <td>
+                                @item.DateOfBirth
+                            </td>
+                            <td>
+                                @item.Gender
+                            </td>
+                            <td>
+                                <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="ViewFullScreen" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="perview">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="Edit" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                    <i class="fa-solid fa-pen fa-red"></i>
+                                </a>
+                                <a class="btn btn-sm" onclick="deleteTemplate(@item.ID)" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                    <i class="fa-solid fa-trash" style="color:red;"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/lib/dataTable/jquery.dataTables.js"></script>
+    @* <script src="~/js/TemplateManagement/index.js"></script> *@
+    <script>
+        $(function () {
+            let table = new DataTable('#PatientsTable', {
+                responsive: true
+            });
+        });
+
+        // function toggleActiveStatus(templateId, isActive) {
+        //     $.ajax({
+        //         url: "/API/Templates/ChangeActiveStatus/" + templateId,
+        //         method: 'POST',
+        //         contentType: 'application/json',
+        //         data: JSON.stringify(isActive),
+        //         success: function (response) {
+        //             console.log("hhhhhhhhhhhhhhhhh");
+        //             window.location.reload();
+        //         },
+        //         error: function (xhr, status, error) {
+        //             console.error(xhr.responseText);
+        //         }
+        //     });
+        // }
+        // function updateStatus(templateId, statusId) {
+        //     $.ajax({
+        //         url: "/api/Templates/ChangeStatus/" + templateId + "/" + statusId,
+        //         method: 'PUT',
+        //         contentType: 'application/json',
+        //         success: function (response) {
+        //             console.log(response);
+
+        //         },
+        //         error: function (xhr, status, error) {
+        //             console.error(xhr.responseText);
+        //         }
+        //     });
+        // }
+
+        // function deleteTemplate(templateTitle, templateId) {
+        //     var id = Number(templateId);
+
+        //     swal.fire({
+        //         title: 'Are you sure?',
+        //         type: 'warning',
+        //         text: "Are you sure you want to delete " + templateTitle + "?",
+        //         showCancelButton: true,
+        //         confirmButtonColor: 'red',
+        //         confirmButtonText: 'Yes',
+        //         cancelButtonText: 'cancel',
+        //         reverseButtons: true
+        //     }).then(function (result) {
+        //         if (result.value) {
+        //             $.ajax({
+        //                 url: "/API/Templates/Delete/" + templateId,
+        //                 method: "DELETE",
+        //                 dataType: "JSON",
+        //                 success: function (data) {
+        //                     console.log(data);
+        //                     window.location.reload();
+        //                 },
+        //                 error: function () {
+
+        //                 }
+        //             });
+        //         }
+        //     });
+        // }
+
+
+        // function toggleApprovedStatus(itemId)
+        // {
+        //     $.ajax({
+        //         type: 'GET',
+        //         url: `/API/Templates/ChangeApprovedStatus?id=${itemId}`,
+        //         success: function (response)
+        //         {
+        //            console.log(response);
+
+        //         },
+        //         error: function () {
+        //             console.error('Error checking MediaTag name.');
+        //         }
+        //     });
+        // }
+
+    </script>
+}

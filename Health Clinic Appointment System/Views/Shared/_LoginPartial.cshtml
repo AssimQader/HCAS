@@ -1,0 +1,57 @@
+﻿@using Health_Clinic_Appointment_System.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<HCASIdentityUser> SignInManager
+@inject UserManager<HCASIdentityUser> UserManager
+
+<ul class="navbar-nav flex-grow-1">
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Dashboard</a>
+        </li>
+        <li>
+            <a class="nav-link text-dark" asp-controller="Patient" asp-action="Index">Patients Management</a>
+        </li>
+        <li>
+            <a class="nav-link text-dark" asp-controller="SceneManagement" asp-action="Index">Doctors Management</a>
+        </li>
+
+        <li>
+            <a class="nav-link text-dark" asp-controller="ScheduleManagement" asp-action="Index">Appointments Management</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark disabled" asp-controller="Home" asp-action="Privacy">Reports</a>
+        </li>
+    }
+</ul>
+<ul class="navbar-nav">
+    @if (!SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Settings" asp-action="Index" title="Control Center">
+                <i class="fa-solid fa-screwdriver-wrench fa-2xl"></i>
+            </a>
+        </li>
+        @* <li class="nav-item">
+            <a class="nav-link text-dark" title="@UserManager.GetUserName(User)!">
+                <i class="fa-solid fa-user-tie fa-2xl"></i>
+            </a>
+        </li> *@
+        <li class="nav-item">
+            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button id="logout" type="submit" class="btn btn-outline-danger">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </a>
+        </li>
+    }
+</ul>
