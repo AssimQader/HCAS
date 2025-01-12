@@ -106,5 +106,42 @@ namespace HCAS.Services.PaymentServices
                 throw new ApplicationException($"Error deleting payment with ID {id}.", ex);
             }
         }
+
+
+        public async Task<List<PaymentDto>> GetPaymentPatientAppointmentDetails()
+        {
+            try
+            {
+                var payments = await _dbContext.Payments
+                    .Include(p => p.Patient)     
+                    .Include(p => p.Appointment)
+                    .Select(p => new PaymentDto
+                    {
+                        ID = p.ID,
+                        Amount = p.Amount,
+                        PaymentDate = p.PaymentDate,
+                        PaymentMethod = p.PaymentMethod,
+                        Patient = new PatientDto
+                        {
+                            FullName = p.Patient.FullName,
+                            PhoneNumber = p.Patient.PhoneNumber
+                        },
+                        Appointment = new AppointmentDto
+                        {
+                            StartDateTime = p.Appointment.StartDateTime,
+                            EndDateTime = p.Appointment.EndDateTime,
+                        }
+                    })
+                    .ToListAsync();
+
+                return payments;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error fetching payments with patient and appointment details.", ex);
+            }
+        }
+
+
     }
 }

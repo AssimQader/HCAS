@@ -7,6 +7,10 @@
         public string Specialization { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
+
+
+        //schedules Information
+        public List<DoctorScheduleDto> DoctorSchedules { get; set; } = [];
     }
 
 }

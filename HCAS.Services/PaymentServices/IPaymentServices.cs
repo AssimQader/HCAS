@@ -14,5 +14,6 @@ namespace HCAS.Services.PaymentServices
         Task<bool> AddPayment(PaymentDto paymentDto);
         Task<bool> UpdatePayment(PaymentDto paymentDto);
         Task<bool> DeletePayment(int id);
+        Task<List<PaymentDto>> GetPaymentPatientAppointmentDetails();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HCAS.DTO;
 using HCAS.Services.AppointmentServices;
+using Health_Clinic_Appointment_System.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Health_Clinic_Appointment_System.Controllers
@@ -17,10 +18,26 @@ namespace Health_Clinic_Appointment_System.Controllers
         {
             try
             {
-                List<AppointmentDto> appointments = await _appointmentService.GetAll();
-                return View(appointments);
+                List<AppointmentDto> appointments = await _appointmentService.GetAppointmentDoctorPatientDetails();
+                List<AppointmentViewModel> AppointmentDetails = [];
+
+                foreach (AppointmentDto appointment in appointments)
+                {
+                    AppointmentDetails.Add(new AppointmentViewModel()
+                    {
+                        PatientName = appointment.Patient.FullName,
+                        DoctorName = appointment.Doctor.FullName,
+                        AppointmentStatus = appointment.Status,
+                        StartDateTime = appointment.StartDateTime,
+                        EndDateTime = appointment.EndDateTime,
+                        PaymentStatus = appointment.PaymentStatus,
+                        AppointmentID = appointment.ID
+                    });
+                }
+
+                return View(AppointmentDetails);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

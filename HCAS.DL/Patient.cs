@@ -16,6 +16,7 @@ namespace HCAS.DL
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
+
         [Required]
         [MaxLength(15)]
         [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]

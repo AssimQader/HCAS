@@ -13,6 +13,9 @@ namespace HCAS.DTO
         public int PatientID { get; set; }
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; }
-        public string PaymentMethod { get; set; } = "Cash";
+        public string PaymentMethod { get; set; }
+
+        public AppointmentDto? Appointment { get; set; } = default!;
+        public PatientDto? Patient { get; set; } = default!; 
     }
 }

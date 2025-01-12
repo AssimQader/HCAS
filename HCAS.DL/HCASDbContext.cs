@@ -49,6 +49,27 @@ namespace HCAS.DL
                 .HasIndex(a => new { a.DoctorID, a.StartDateTime, a.EndDateTime }) 
                 .HasDatabaseName("IX_Appointment_Doctor_Overlap")
                 .IsUnique();
+
+
+            //add "Unique" Constraint to Prevent repeating schedules for the same Doctor
+            builder.Entity<DoctorSchedule>()
+                .HasIndex(a => new { a.DoctorID, a.DayOfWeek, a.StartTime })
+                .HasDatabaseName("IX_DoctorSchedule_Overlap")
+                .IsUnique();
+
+
+
+            builder.Entity<Doctor>()
+                .HasIndex(d => d.PhoneNumber)
+                .HasDatabaseName("IX_Doctor_PhoneNum")
+                .IsUnique();
+
+
+            builder.Entity<Patient>()
+                .HasIndex(p => p.PhoneNumber)
+                .HasDatabaseName("IX_Patient_PhoneNum")
+                .IsUnique();
+
         }
     }
 }

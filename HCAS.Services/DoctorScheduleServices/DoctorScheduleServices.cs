@@ -20,16 +20,29 @@ namespace HCAS.Services.DoctorScheduleServices
         }
 
 
-
+        //get shcedules with doctors data(full name)
         public async Task<List<DoctorScheduleDto>> GetAll()
         {
             try
             {
-                List<DoctorSchedule> schedules = await _dbContext.DoctorsSchedules.ToListAsync();
+                List<DoctorScheduleDto> schedules = await _dbContext.DoctorsSchedules
+                    .Include(ds => ds.Doctor)
+                    .Select(ds => new DoctorScheduleDto
+                    {
+                        DayOfWeek = ds.DayOfWeek,
+                        StartTime = ds.StartTime,   
+                        EndTime = ds.EndTime,   
+                        ID = ds.ID,
+                        Doctor = new DoctorDto
+                        {
+                            FullName = ds.Doctor.FullName
+                        }
+                    })
+                    .ToListAsync();
                 if (schedules == null || schedules.Count == 0)
                     return [];
 
-                return Mapper.Map(schedules);
+                return schedules;
             }
             catch (Exception ex)
             {

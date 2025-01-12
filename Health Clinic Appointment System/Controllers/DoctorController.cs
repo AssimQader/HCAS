@@ -31,7 +31,7 @@ namespace Health_Clinic_Appointment_System.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new DoctorDto());
         }
 
         [HttpPost]

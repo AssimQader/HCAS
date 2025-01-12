@@ -159,5 +159,39 @@ namespace HCAS.Services.AppointmentServices
             return conflictingAppointments.Count == 0;
         }
 
+
+        public async Task<List<AppointmentDto>> GetAppointmentDoctorPatientDetails()
+        {
+            try
+            {
+                var appointments = await _dbContext.Appointments
+                    .Include(a => a.Patient)
+                    .Include(a => a.Doctor)
+                    .Select(a => new AppointmentDto
+                    {
+                        ID = a.ID,
+                        StartDateTime = a.StartDateTime,
+                        EndDateTime = a.EndDateTime,
+                        Status = a.Status,
+                        PaymentStatus = a.PaymentStatus,
+                        Patient = new PatientDto
+                        {
+                            FullName = a.Patient.FullName
+                        },
+                        Doctor = new DoctorDto
+                        {
+                            FullName = a.Doctor.FullName
+                        }
+                    })
+                    .ToListAsync();
+
+                return appointments;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error fetching payments with patient and appointment details.", ex);
+            }
+        }
+
     }
 }

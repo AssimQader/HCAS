@@ -1,5 +1,6 @@
 using HCAS.DL;
 using HCAS.Services.AppointmentServices;
+using HCAS.Services.DoctorScheduleServices;
 using HCAS.Services.DoctorServices;
 using HCAS.Services.PatientServices;
 using HCAS.Services.PaymentServices;
@@ -35,6 +36,7 @@ namespace Health_Clinic_Appointment_System
             builder.Services.AddScoped(typeof(IDoctorServices), typeof(DoctorServices));
             builder.Services.AddScoped(typeof(IAppointmentServices), typeof(AppointmentServices));
             builder.Services.AddScoped(typeof(IPaymentServices), typeof(PaymentServices));
+            builder.Services.AddScoped(typeof(IDoctorScheduleServices), typeof(DoctorScheduleServices));
 
 
 

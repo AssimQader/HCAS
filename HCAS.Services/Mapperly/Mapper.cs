@@ -45,6 +45,7 @@ namespace HCAS.Services.Mapperly
         //public partial TemplateDto Map(Template source);
 
 
+
         //---- INFOS ----//
 
         // Custom mapping for properties with different names

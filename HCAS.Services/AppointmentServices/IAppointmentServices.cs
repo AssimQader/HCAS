@@ -16,5 +16,6 @@ namespace HCAS.Services.AppointmentServices
         Task<bool> DeleteAppointment(int id);
         Task<PatientDto> GetPatientByAppointmentId(int appointmentId);
         Task<DoctorDto> GetDoctorByAppointmentId(int appointmentId);
+        Task<List<AppointmentDto>> GetAppointmentDoctorPatientDetails();
     }
 }

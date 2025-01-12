@@ -9,9 +9,10 @@ namespace HCAS.DTO
     public record DoctorScheduleDto
     {
         public int ID { get; set; }
-        public int DoctorID { get; set; }
-        public string DayOfWeek { get; set; } = string.Empty;
+        public string DayOfWeek { get; set; }
         public TimeSpan StartTime { get; set; } 
         public TimeSpan EndTime { get; set; }
+
+        public DoctorDto? Doctor { get; set; }
     }
 }

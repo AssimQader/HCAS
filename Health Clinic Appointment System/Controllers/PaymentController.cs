@@ -1,5 +1,7 @@
 ﻿using HCAS.DTO;
+using HCAS.Services.Mapperly;
 using HCAS.Services.PaymentServices;
+using Health_Clinic_Appointment_System.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Health_Clinic_Appointment_System.Controllers
@@ -17,10 +19,27 @@ namespace Health_Clinic_Appointment_System.Controllers
         {
             try
             {
-                List<PaymentDto> payments = await _paymentService.GetAll();
-                return View(payments);
+                List<PaymentDto> payments = await _paymentService.GetPaymentPatientAppointmentDetails();
+                List<PaymentViewModel> paymentDetails = [];
+
+                foreach (PaymentDto payment in payments)
+                {
+                    paymentDetails.Add(new PaymentViewModel()
+                    {
+                        PatientName = payment.Patient.FullName,
+                        PatientPhoneNumber = payment.Patient.PhoneNumber,
+                        AppointmentStartDateTime = payment.Appointment.StartDateTime,
+                        AppointmentEndDateTime = payment.Appointment.EndDateTime,
+                        Amount = payment.Amount,
+                        PaymentDate = payment.PaymentDate,
+                        PaymentID = payment.ID,
+                        PaymentMethod = payment.PaymentMethod
+                    });
+                }
+
+                return View(paymentDetails);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }

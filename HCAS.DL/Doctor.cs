@@ -20,6 +20,7 @@ namespace HCAS.DL
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
+
         [Required]
         [MaxLength(15)]
         [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]
@@ -31,5 +32,6 @@ namespace HCAS.DL
 
         //Navigation Properties
         public virtual ICollection<Appointment>? Appointments { get; set; } = [];
+        public virtual ICollection<DoctorSchedule>? DoctorSchedules { get; set; } = [];
     }
 }
