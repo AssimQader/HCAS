@@ -97,5 +97,29 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> CheckPhoneExists(string phoneNum)
+        {
+            try
+            {
+                bool isExists = await _patientService.IsPhoneNumberExists(phoneNum);
+
+                if (isExists)
+                {
+                    return Json(new { exists = true, message = "A user with the same phone number already exists!" }); //return json object of two properties: exists, message
+                }
+
+                return Json(new { exists = false, message = "" });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { exists = false, message = $"An error occurred while checking the phone number: {ex.Message}" });
+            }
+        }
     }
 }

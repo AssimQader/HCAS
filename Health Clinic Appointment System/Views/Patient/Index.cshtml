@@ -111,15 +111,14 @@
                             <div class="mb-3 position-relative">
                                 <label for="Email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="Email" name="Email" required />
+                                <div class="invalid-feedback"></div>  <!-- Empty div for dynamic error message -->
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3 position-relative">
                                 <label for="PhoneNumber" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+201061103073" min="11" required />
-                                <div class="invalid-feedback">
-                                    Invalid phone number format. Use international format (e.g., +201061103073).
-                                </div>
+                                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+20 1061 1030 73" min="11" required />
+                                <div class="invalid-feedback"></div>  <!-- Empty div for dynamic error message -->
                             </div>
                         </div>
                         <div class="col-md-6">

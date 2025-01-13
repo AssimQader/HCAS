@@ -1,60 +1,129 @@
 ﻿
 
-//validations
+// -------------------- Input Validations & Check phone number exsistance ----------------- //
+
 (function () {
     'use strict';
 
-    //define a regex map 
+    // Validation rules and messages
     const regexMap = {
-        PhoneNumber: /^\+2?[1-9]\d{1,14}$/, // E.164 format regex
-        Email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Basic email format
+        PhoneNumber: {
+            regex: /^\+2[0-9]\d{10}$/, // E.164 format with minimum length 13 (e.g., +201061103073)
+            message: "Phone numbers must start with +2 and have exactly 13 characters!"
+        },
+        Email: {
+            regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Basic email format
+            message: "Please enter a valid email address!"
+        },
     };
 
-    //validate a single input field
-    const validateInput = (input) => {
-        const regex = regexMap[input.id]; // Get regex based on input ID
-        if (regex)
+
+    /**
+     * Validate input field based on regex or built-in validation.
+     * @param {HTMLInputElement} input - Input element to validate.
+     */
+    const validateInput = async (input) => {
+        const feedbackDiv = input.nextElementSibling;
+        const validationRule = regexMap[input.id];
+
+        if (validationRule)
         {
-            if (regex.test(input.value)) {
-                input.classList.add("is-valid");
-                input.classList.remove("is-invalid");
-            } else {
+            // Check against regex
+            if (validationRule.regex.test(input.value)) {
+                // If the input is PhoneNumber, perform an additional server-side check
+                if (input.id === "PhoneNumber") {
+                    const exists = await checkPhoneExists(input.value, feedbackDiv);
+                    if (!exists)
+                    {
+                        input.classList.add("is-valid");
+                        input.classList.remove("is-invalid");
+                        feedbackDiv.textContent = ""; 
+                    }
+                }
+                else
+                {
+                    input.classList.add("is-valid");
+                    input.classList.remove("is-invalid");
+                    feedbackDiv.textContent = "";
+                }
+            }
+            else
+            {
                 input.classList.add("is-invalid");
                 input.classList.remove("is-valid");
+                feedbackDiv.textContent = validationRule.message; 
             }
-        } else if (input.checkValidity()) {
+        }
+        else if (input.checkValidity())
+        {
             input.classList.add("is-valid");
             input.classList.remove("is-invalid");
-        } else {
+            feedbackDiv.textContent = "";
+        }
+        else
+        {
             input.classList.add("is-invalid");
             input.classList.remove("is-valid");
+            feedbackDiv.textContent = input.validationMessage; 
+        }
+    };
+
+    /**
+     * Check if a phone number exists in the database via server-side validation.
+     * @param {string} phoneNumber - Phone number to check.
+     * @param {HTMLElement} feedbackDiv - Div to display validation message.
+     * @returns {boolean} - Returns true if the phone number exists, otherwise false.
+     */
+    const checkPhoneExists = async (phoneNumber, feedbackDiv) => {
+        try {
+            const response = await fetch(`/Doctor/CheckPhoneExists?phoneNum=${encodeURIComponent(phoneNumber)}`);
+            const result = await response.json();
+
+            if (result.exists) {
+                feedbackDiv.textContent = "A user with this phone number already exists!"; // Set dynamic error message
+                feedbackDiv.style.display = "block"; // Ensure the feedback is visible
+                return true; // Phone number exists
+            } else {
+                feedbackDiv.textContent = ""; // Clear feedback
+                feedbackDiv.style.display = "none"; // Hide the feedback message
+                return false; // Phone number does not exist
+            }
+        } catch (error) {
+            console.error("Error checking phone number:", error);
+            feedbackDiv.textContent = "An error occurred while validating the phone number."; // Handle unexpected errors
+            feedbackDiv.style.display = "block";
+            return true; // Assume the phone exists to prevent issues
         }
     };
 
 
-    //add real-time validation to all inputs
+    /**
+     * Add blur event listeners to all inputs for real-time validation.
+     */
     const inputs = document.querySelectorAll("input, select");
     inputs.forEach((input) => {
-        input.addEventListener("input", () => validateInput(input));
+        input.addEventListener("blur", () => validateInput(input)); // Trigger validation on blur
     });
 
 
-    //handle form submission
+
+    /**
+     * Handle form submission by validating all inputs.
+     */
     const forms = document.querySelectorAll('.needs-validation');
     forms.forEach((form) => {
         form.addEventListener('submit', (event) => {
             let isFormValid = true;
 
-            //validate all inputs before submission
             inputs.forEach((input) => {
-                validateInput(input);
+                validateInput(input); // Validate each input
                 if (!input.classList.contains("is-valid")) {
-                    isFormValid = false;
+                    isFormValid = false; // Mark the form invalid if any input fails validation
                 }
             });
 
             if (!isFormValid || !form.checkValidity()) {
-                event.preventDefault();
+                event.preventDefault(); // Prevent form submission
                 event.stopPropagation();
             }
 
@@ -65,8 +134,8 @@
 
 
 
+// -------------------- Alerts after add new doctor ----------------- //
 
-//after add new doctor succesfully: 
 document.getElementById("addDoctorForm").addEventListener("submit", async function (event)
 {
     event.preventDefault();
@@ -119,4 +188,9 @@ document.getElementById("addDoctorForm").addEventListener("submit", async functi
         console.error("Error:", error);
     }
 });
+
+
+
+
+
 

@@ -16,5 +16,6 @@ namespace HCAS.Services.DoctorServices
         Task<bool> DeleteDoctor(int id);
         Task<List<AppointmentDto>> GetAppointmentsByDoctorId(int doctorId);
         Task<List<PatientDto>> GetPatientsByDoctorId(int doctorId);
+        Task<bool> IsPhoneNumberExists(string phoneNum);
     }
 }

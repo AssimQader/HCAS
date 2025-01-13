@@ -23,7 +23,8 @@ namespace HCAS.DL
 
         [Required]
         [MaxLength(15)]
-        [RegularExpression(@"^\+?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]
+        [MinLength(13)]
+        [RegularExpression(@"^\+2?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

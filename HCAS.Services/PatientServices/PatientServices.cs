@@ -145,5 +145,21 @@ namespace HCAS.Services.PatientServices
                 throw new ApplicationException($"Error fetching payments for patient with ID {patientId}.", ex);
             }
         }
+
+
+
+
+        public async Task<bool> IsPhoneNumberExists(string phoneNumber)
+        {
+            try
+            {
+                bool result = await _dbContext.Patients.AnyAsync(d => d.PhoneNumber == phoneNumber);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error checking phone number existence: {ex.Message}", ex);
+            }
+        }
     }
 }
