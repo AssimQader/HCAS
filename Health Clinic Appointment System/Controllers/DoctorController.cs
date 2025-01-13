@@ -34,6 +34,7 @@ namespace Health_Clinic_Appointment_System.Controllers
             return View(new DoctorDto());
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Create(DoctorDto doctorDto)
         {
@@ -43,10 +44,11 @@ namespace Health_Clinic_Appointment_System.Controllers
             try
             {
                 await _doctorService.AddDoctor(doctorDto);
-                return RedirectToAction("Index");
+                return Json(new { success = true, message = "Doctor added successfully!" }); //return json to the success of error methods of Ajax call in js file
             }
             catch (Exception ex)
             {
+                return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" }); //return json to the error method of Ajax call in js file
                 throw;
             }
         }

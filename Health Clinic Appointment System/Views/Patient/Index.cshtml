@@ -74,9 +74,6 @@
                                 @item.Gender
                             </td>
                             <td>
-                                <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="ViewFullScreen" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="perview">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
                                 <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="Edit" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                     <i class="fa-solid fa-pen fa-red"></i>
                                 </a>
@@ -101,7 +98,7 @@
                 <h5 class="modal-title" id="addPatientModalLabel">Add New Patient</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="addPatientForm" class="needs-validation" novalidate method="post" asp-controller="Patient" asp-action="Create">
+            <form id="addPatientForm" class="needs-validation" novalidate>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
@@ -157,7 +154,7 @@
 
 @section scripts {
     <script src="~/lib/dataTable/jquery.dataTables.js"></script>
-    <script src="~/js/patient/ModalInputsValidation.js"></script>
+    <script src="~/js/Patient/patient.js"></script>
 
     <script>
         $(function () {

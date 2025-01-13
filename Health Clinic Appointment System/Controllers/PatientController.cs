@@ -42,10 +42,11 @@ namespace Health_Clinic_Appointment_System.Controllers
             try
             {
                 await _patientService.AddPatient(patientDto);
-                return RedirectToAction("Index");
+                return Json(new { success = true, message = "Patient added successfully!" }); //return json to the success method of Ajax call in js file
             }
             catch (Exception ex)
             {
+                return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" }); //return json to the error method of Ajax call in js file
                 throw;
             }
         }

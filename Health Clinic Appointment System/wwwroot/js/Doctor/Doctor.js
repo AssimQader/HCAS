@@ -65,3 +65,58 @@
 
 
 
+
+//after add new doctor succesfully: 
+document.getElementById("addDoctorForm").addEventListener("submit", async function (event)
+{
+    event.preventDefault();
+
+    const form = this;
+    const formData = new FormData(form);
+
+    try
+    {
+        //send the form data to the server using Fetch API
+        const response = await fetch("/Doctor/Create", {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success)
+        {
+            // Show success alert
+            Swal.fire({
+                icon: "success",
+                title: "Success!",
+                text: result.message,
+                confirmButtonText: "OK",
+            }).then(() => {
+                //reload the page, reset the form and close the modal
+                form.reset();
+                document.getElementById("addDoctorModal").click(); //close modal
+                location.reload(); 
+            });
+        } else {
+            // Show error alert
+            Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: result.message,
+                confirmButtonText: "OK",
+            });
+        }
+    }
+    catch (error)
+    {
+        Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "An unexpected error occurred!",
+            confirmButtonText: "OK",
+        });
+        console.error("Error:", error);
+    }
+});
+
