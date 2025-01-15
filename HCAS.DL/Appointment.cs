@@ -29,7 +29,7 @@ namespace HCAS.DL
         public string PaymentStatus { get; set; } = "Pending"; //default value untill patient come to clinic and pay
 
         [MaxLength(200)]
-        public string Notes { get; set; } = string.Empty;
+        public string? Notes { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;

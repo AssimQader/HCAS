@@ -3,58 +3,156 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Health_Clinic_Appointment_System</title>
+    <title>@ViewData["Title"] - HCAS System</title>
+
+    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Health_Clinic_Appointment_System.styles.css" asp-append-version="true" />
 
-    <link href="~/lib/fontawesome/css/fontawesome.css" rel="stylesheet" />
-    <link href="~/lib/fontawesome/css/brands.css" rel="stylesheet" />
-    <link href="~/lib/fontawesome/css/solid.css" rel="stylesheet" />
-    <link href="~/lib/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <!-- FontAwesome for icons -->
+    <link href="~/lib/fontawesome/css/all.min.css" rel="stylesheet" />
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Custom Dark Mode Styles -->
+    <style>
+        :root {
+            --background-color: #f8f9fa;
+            --text-color: #212529;
+            --nav-bg-color: #ffffff;
+            --nav-link-color: #000000;
+            --nav-link-hover: #007bff;
+        }
 
-    @RenderSection("styles", required: false) <!-- render styles written inside any view page-->
+            :root.dark-mode {
+                --background-color: #121212;
+                --text-color: #212529;
+                --nav-bg-color: #ffffff;
+                --nav-link-color: #000000;
+                --nav-link-hover: #66b3ff;
+            }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar {
+            background-color: var(--nav-bg-color);
+            transition: background-color 0.3s;
+        }
+
+        .navbar-brand, .nav-link {
+            color: var(--nav-link-color) !important;
+            transition: color 0.3s;
+        }
+
+            .nav-link:hover {
+                color: var(--nav-link-hover) !important;
+            }
+
+        footer {
+            background-color: var(--nav-bg-color);
+            color: var(--nav-link-color);
+            padding: 1rem 0;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background-color: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .toggle-switch.active {
+                background-color: #66b3ff; /* Light Blue for Light Mode */
+            }
+
+            .toggle-switch .toggle-knob {
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 21px;
+                height: 21px;
+                background-color: #ffffff;
+                border-radius: 50%;
+                transition: all 0.3s;
+            }
+
+            .toggle-switch.active .toggle-knob {
+                left: calc(100% - 23px); /* Align to the right */
+            }
+    </style>
+
+    @RenderSection("styles", required: false)
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg shadow">
             <div class="container-fluid">
-                <a class="navbar-brand" href="index.html">HCAS System</a>
+                <a class="navbar-brand fw-bold" href="/">HCAS System</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class="nav-link" asp-controller="Patient" asp-action="Index">Patients</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Doctor" asp-action="Index">Doctors</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="DoctorSchedule" asp-action="Index">Doctors Schedules</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Appointment" asp-action="Index">Appointments</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Payment" asp-action="Index">Payments</a></li>
                     </ul>
+                    <div id="darkModeToggle" class="toggle-switch">
+                        <div class="toggle-knob"></div>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <div class="container-fluid">
-        <main role="main" class="pb-3">
+    <div class="container mt-4">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-light text-center py-3">
-        <p>© 2025 HCAS System. All rights reserved to Asem Adel</p>
-    </footer>
+   @*  <footer>
+        <p>© 2025 HCAS System. Designed by Asem Adel</p>
+    </footer> *@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>   
-    
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggle = document.getElementById('darkModeToggle');
+            const root = document.documentElement;
+
+            // Load the saved theme preference from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                root.classList.add('dark-mode');
+                toggle.classList.add('active');
+            }
+
+            // Handle toggle click
+            toggle.addEventListener('click', function () {
+                if (toggle.classList.contains('active')) {
+                    root.classList.remove('dark-mode');
+                    toggle.classList.remove('active');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    root.classList.add('dark-mode');
+                    toggle.classList.add('active');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

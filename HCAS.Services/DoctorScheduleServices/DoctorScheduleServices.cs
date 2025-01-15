@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,8 +31,8 @@ namespace HCAS.Services.DoctorScheduleServices
                     .Select(ds => new DoctorScheduleDto
                     {
                         DayOfWeek = ds.DayOfWeek,
-                        StartTime = ds.StartTime,   
-                        EndTime = ds.EndTime,   
+                        StartTime = DateTime.Today.Add(ds.StartTime).ToString("hh:mm tt"),
+                        EndTime = DateTime.Today.Add(ds.EndTime).ToString("hh:mm tt"),
                         ID = ds.ID,
                         Doctor = new DoctorDto
                         {
@@ -92,9 +93,10 @@ namespace HCAS.Services.DoctorScheduleServices
                     ?? throw new KeyNotFoundException($"Schedule with ID {scheduleDto.ID} not found.");
 
                 schedule.DayOfWeek = scheduleDto.DayOfWeek;
-                schedule.StartTime = scheduleDto.StartTime;
-                schedule.EndTime = scheduleDto.EndTime;
-                
+                schedule.StartTime = TimeSpan.Parse(DateTime.ParseExact(scheduleDto.StartTime, "hh:mm tt", CultureInfo.InvariantCulture).ToString("HH:mm:ss"));
+                schedule.EndTime = TimeSpan.Parse(DateTime.ParseExact(scheduleDto.EndTime, "hh:mm tt", CultureInfo.InvariantCulture).ToString("HH:mm:ss"));
+
+
 
                 _dbContext.DoctorsSchedules.Update(schedule);
                 int affectedRows = await _dbContext.SaveChangesAsync();
@@ -143,5 +145,41 @@ namespace HCAS.Services.DoctorScheduleServices
                 throw new ApplicationException($"Error fetching schedules for doctor with ID {doctorId}.", ex);
             }
         }
+
+
+        public async Task<bool> IsDoctorScheduledOnDay(int doctorId, string dayOfWeek)
+        {
+            try
+            {
+                return await _dbContext.DoctorsSchedules
+                    .AnyAsync(ds => ds.DoctorID == doctorId && ds.DayOfWeek.Equals(dayOfWeek));
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error checking doctor schedule availability.", ex);
+            }
+        }
+
+
+        public async Task<bool> IsSlotAvailable(int doctorId, string day, TimeSpan startTime, TimeSpan endTime)
+        {
+            try
+            {
+                //check if the provided slot is strictly within the existing schedule for the doctor
+                return await _dbContext.DoctorsSchedules
+                    .AnyAsync(ds =>
+                        ds.DoctorID == doctorId &&
+                        ds.DayOfWeek == day &&
+                        startTime >= ds.StartTime && 
+                        endTime <= ds.EndTime
+                    );
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error checking doctor slot availability.", ex);
+            }
+        }
+
+
     }
 }

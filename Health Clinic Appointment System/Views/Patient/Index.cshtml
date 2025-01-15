@@ -48,7 +48,6 @@
                         <th style="text-align: center;">Name</th>
                         <th style="text-align: center;">Email</th>
                         <th style="text-align: center;">Phone Number</th>
-                        <th style="text-align: center;">Date Of Birth</th>
                         <th style="text-align: center;">Gender</th>
                         <th style="text-align: center;">Options</th>
                     </tr>
@@ -66,9 +65,6 @@
                             </td>
                             <td>
                                 @item.PhoneNumber
-                            </td>
-                            <td>
-                                @item.DateOfBirth
                             </td>
                             <td>
                                 @item.Gender
@@ -119,13 +115,6 @@
                                 <label for="PhoneNumber" class="form-label">Phone Number</label>
                                 <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+20 1061 1030 73" min="11" required />
                                 <div class="invalid-feedback"></div>  <!-- Empty div for dynamic error message -->
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3 position-relative">
-                                <label for="DateOfBirth" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" id="DateOfBirth" name="DateOfBirth" required />
-                               
                             </div>
                         </div>
                         <div class="col-md-6">

@@ -193,5 +193,21 @@ namespace HCAS.Services.AppointmentServices
             }
         }
 
+
+
+        public async Task<bool> IsAppointmentExists(int doctorId, DateTime startDateTime, DateTime endDateTime)
+        {
+            try
+            {
+                return await _dbContext.Appointments.AnyAsync(app =>
+                    app.DoctorID == doctorId && app.StartDateTime == startDateTime && app.EndDateTime == endDateTime);  
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error while checking for overlapping appointments.", ex);
+            }
+        }
+
+
     }
 }

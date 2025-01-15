@@ -16,8 +16,9 @@ namespace HCAS.DTO
         public DateTime EndDateTime { get; set; }
         public string Status { get; set; }
         public string PaymentStatus { get; set; }
+        public string? Notes { get; set; } = string.Empty;
 
-        public  PatientDto? Patient { get; set; } = default!;
+        public PatientDto? Patient { get; set; } = default!;
         public  DoctorDto? Doctor { get; set; } = default!;
     }
 }

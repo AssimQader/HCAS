@@ -15,6 +15,7 @@ namespace Health_Clinic_Appointment_System.Controllers
             _doctorScheduleService = doctorScheduleService;
         }
 
+
         public async Task<IActionResult> Index()
         {
             try
@@ -27,8 +28,6 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
-
-
 
         [HttpGet]
         public IActionResult Create()
@@ -52,8 +51,6 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
-
-
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -99,5 +96,54 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> IsAvailableDay(int id, string day)
+        {
+            try
+            {
+                bool isAvailable = await _doctorScheduleService.IsDoctorScheduledOnDay(id, day);
+
+                if (isAvailable)
+                {
+                    return Json(new { exists = true, message = $"The doctor is scheduled on {day}." });
+                }
+
+                return Json(new { exists = false, message = $"The doctor is not scheduled on {day}." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { exists = false, message = $"An error occurred while checking the schedule: {ex.Message}" });
+            }
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> CheckSlot(int docId, string day, string st, string et)
+        {
+            try
+            {
+                //convert input start and end times to TimeSpan
+                TimeSpan startTime = TimeSpan.Parse(st);
+                TimeSpan endTime = TimeSpan.Parse(et);
+
+                bool isSlotAvailable = await _doctorScheduleService.IsSlotAvailable(docId, day, startTime, endTime);
+
+                if (isSlotAvailable)
+                {
+                    return Json(new { exists = true, message = "The selected slot is available." });
+                }
+
+                return Json(new { exists = false, message = "The selected slot overlaps with an existing schedule." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { exists = false, message = $"An error occurred while checking the slot: {ex.Message}" });
+            }
+        }
+
+
     }
 }

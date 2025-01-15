@@ -1,4 +1,5 @@
-﻿using HCAS.DTO;
+﻿using HCAS.DL;
+using HCAS.DTO;
 using HCAS.Services.AppointmentServices;
 using Health_Clinic_Appointment_System.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -44,12 +45,12 @@ namespace Health_Clinic_Appointment_System.Controllers
         }
 
 
-
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Create(AppointmentDto appointmentDto)
@@ -60,10 +61,15 @@ namespace Health_Clinic_Appointment_System.Controllers
             try
             {
                 await _appointmentService.AddAppointment(appointmentDto);
-                return RedirectToAction("Index");
+                return Json(new
+                {
+                    success = true,
+                    message = "Appointment is booked for the patient successfully!"
+                }); //return json to the success method of Ajax call in js file
             }
             catch (Exception ex)
             {
+                return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" }); //return json to the error method of Ajax call in js file
                 throw;
             }
         }
@@ -115,5 +121,66 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> IsExists(int docId, DateTime sdt, DateTime edt)
+        {
+            try
+            {
+                bool isExists = await _appointmentService.IsAppointmentExists(docId, sdt, edt);
+
+                if (isExists)
+                {
+                    return Json(new
+                    {
+                        exists = true,
+                        message = "An appointment already exists for the doctor!"
+                    });
+                }
+
+                return Json(new
+                {
+                    exists = false,
+                    message = "No appointment conflicts found."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    exists = false,
+                    message = $"An error occurred while checking for appointment conflicts: {ex.Message}"
+                });
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllAppointments()
+        {
+            try
+            {
+                List<AppointmentDto> appointments = await _appointmentService.GetAppointmentDoctorPatientDetails();
+
+                var appointmentDetails = appointments.Select(appointment => new
+                {
+                    PatientName = appointment.Patient.FullName,
+                    DoctorName = appointment.Doctor.FullName,
+                    StartDateTime = appointment.StartDateTime.ToString("yyyy-MM-ddTHH:mm:ss"), // ISO format for FullCalendar
+                    EndDateTime = appointment.EndDateTime.ToString("yyyy-MM-ddTHH:mm:ss"),     // ISO format for FullCalendar
+                    AppointmentID = appointment.ID,
+                    PaymentStatus = appointment.PaymentStatus,
+                }).ToList();
+
+                return Json(appointmentDetails);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An error occurred while fetching appointments.", details = ex.Message });
+            }
+        }
+
+
     }
 }

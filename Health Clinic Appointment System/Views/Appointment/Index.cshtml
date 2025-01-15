@@ -7,17 +7,25 @@
 
 @section styles
 {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/airbnb.css">
+
     <link href="~/lib/dataTable/jquery.dataTables.css" rel="stylesheet" />
+    <link href="~/lib/sweetalert2/sweetalert2.min.css" rel="stylesheet" />    
     <style>
 
     </style>
+
 }
+
+
+@* first quarter of page *@
 
 <div class="row mb-3">
     <div class="card">
         <div class="card-body">
             <div class="row mb-3">
-                <div class="col-10">
+                <div class="col-8">
                     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
@@ -25,25 +33,144 @@
                                     <i class="fa-solid fa-house"></i>
                                 </a>
                             </li>
-                            <li class="breadcrumb-item active" aria-current="page">Appointments Management</li>
+                            <li class="breadcrumb-item active" aria-current="page">Schedule Management</li>
                         </ol>
                     </nav>
                 </div>
-                <div class="col-2 d-flex justify-content-end">
-                    <a type="button" class="btn btn-primary btn-style-light d-flex align-items-center me-2" asp-action="Create">
-                        <i class="fa-solid fa-plus" style="margin-right:5px;"></i>
+                <div class="col-4 d-flex justify-content-end">
+                    <div class="btn-group" role="group" aria-label="Vertical radio toggle button group">
+                        &nbsp;
+                        <input type="radio" class="btn-check" name="viewOption-radio" id="viewAsTable" autocomplete="off">
+                        <label class="btn btn-outline-secondary" for="viewAsTable">view as Table</label>
+
+                        <input type="radio" class="btn-check" name="viewOption-radio" id="viewAsCalender" autocomplete="off" checked>
+                        <label class="btn btn-outline-secondary" for="viewAsCalender">view as Calender</label>
+                    </div>
+                    &nbsp;
+                    <button id="btnGroupDrop1" type="button" onclick="showHideAddEventForm()" class="btn btn-primary btn-style-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-plus"></i>
                         Add New
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mb-3">
+
+<!-- start: add new appointment -->
+<div class="row mb-3" id="addAppointmentForm" style="display:none;">
     <div class="card">
         <div class="card-body">
-            <table id="PaymentsTable" class="display text-center" style="width:100%;">
+            <form class="row g-3">
+                <h5>Book Appointment</h5>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="Specialization" class="form-label">Specialization</label>
+                        <select class="form-select" id="Specialization" name="Specialization" required>
+                            <option value="" selected disabled>Select Specialization</option>
+                            <option value="Cardiologist">Cardiologist</option>
+                            <option value="Orthopedist">Orthopedist</option>
+                            <option value="Nephrologist">Nephrologist</option>
+                            <option value="Oncologist">Oncologist</option>
+                            <option value="Pulmonologist">Pulmonologist</option>
+                            <option value="Rheumatologist">Rheumatologist</option>
+                            <option value="Urologist">Urologist</option>
+                            <option value="Anesthesiologist">Anesthesiologist</option>
+                            <option value="Pathologist">Pathologist</option>
+                            <option value="Plastic Surgeon">Plastic Surgeon</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a valid specialization.</div>
+                    </div>
+                    <div class="col-6">
+                        <label for="DoctorsList" class="form-label">Doctor</label>
+                        <select class="form-select" id="DoctorsList" required>
+                            <option value="" selected disabled>Select Doctor</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a doctor.</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label for="Date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="Date" name="Date" required />
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" id="StartTime" class="form-control schedule-start-time" required />
+                        <div class="invalid-feedback">Please select a valid start time.</div>
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">End Time</label>
+                        <input type="time" id="EndTime" class="form-control schedule-end-time" required />
+                        <div class="invalid-feedback">Please select a valid end time.</div>
+                    </div>
+                </div>
+                <div id="errorMessage" class="text-danger mt-3" style="display: none;"></div>
+            </form>
+            <br />
+            <br />
+            <form id="addPatientForm" class="needs-validation row g-3" novalidate>
+                <h5>Patient Data</h5>
+                <div class="modal-body" style="margin-top:-10px;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="FullName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="FullName" name="FullName" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="Email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="Email" name="Email" required />
+                                <div class="invalid-feedback"></div>  <!-- Empty div for dynamic error message -->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="PhoneNumber" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+20 1061 1030 73" min="11" required />
+                                <div class="invalid-feedback"></div>  <!-- Empty div for dynamic error message -->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3 position-relative">
+                                <label for="Gender" class="form-label">Gender</label>
+                                <select class="form-select" id="Gender" name="Gender" required>
+                                    <option value="" selected disabled>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="col-12 d-flex flex-row-reverse mt-3">
+                <button id="submitBtn" type="button" class="btn btn-outline-primary p-2">Add</button>
+                &nbsp;
+                <button id="closeEventFormBtn" type="reset" class="btn btn-outline-danger p-2" onclick="clearAndCloseAppointmentForm()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- end: add new appointment -->
+
+
+
+<div class="row mb-3">
+    <div class="card">
+        <!-- calender view -->
+        <div class="card-body" id="calenderView" style="display:block;">
+            <h1>Calender View</h1>
+            <div id='calendar'>
+            </div>
+        </div>
+        <!-- table view -->
+        <div class="card-body table-responsive" id="tableView" style="display:none;">
+            <table id="ScheduleTable" class="display text-center" style="width:100%;">
                 <thead>
                     <tr>
                         <th hidden>ID</th>
@@ -95,96 +222,86 @@
                     }
                 </tbody>
             </table>
+
+
+            <!-- Events Modal -->
+            <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Events Data</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="eventModalBody">
+                            <div id="tableModal" class="card-body table-responsive" style="display:block;">
+
+                                <table id="eventsTableModal" class="display text-center" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: center;">Title</th>
+                                            <th style="text-align: center;">Start Time</th>
+                                            <th style="text-align: center;">Duration</th>
+                                            <th style="text-align: center;">End Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="eventTableBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-@section scripts {
+
+
+@*
+    ---------------------------------------------------------------------------
+    ------------------ Modal :  go to custom calender date --------------------
+    ---------------------------------------------------------------------------
+    *@
+<button hidden id="showSelectCalenderDateModalBtn" type="button" class="btn btn-primary m-b-sm" data-bs-toggle="modal" data-bs-target="#customDateModal"></button>
+<div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="exampleModalCenterTitle" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                @* <h5 class="modal-title" id="exampleModalCenterTitle">Modal title</h5> *@
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="customCalenderDate" class="form-control flatpickr1" type="text" placeholder="Select Date..">
+            </div>
+            <div class="modal-footer">
+                <button id="closeCustomCalenderModelBtn" type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+                <button id="goCustomCalenderDateBtn" type="button" class="btn btn-outline-primary">View</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="~/lib/dataTable/jquery.dataTables.js"></script>
-    @* <script src="~/js/TemplateManagement/index.js"></script> *@
+    <script src="~/lib/sweetalert2/sweetalert2.all.min.js"></script>
+    <script src="~/lib/calender/index.global.js"></script>
+    <script src="~/lib/calender/index.global.min.js"></script>
+    <script src="~/js/Appointment/Index.js"></script>
+
+
+
     <script>
-        $(function () {
-            let table = new DataTable('#PaymentsTable', {
-                responsive: true
-            });
-        });
-
-        // function toggleActiveStatus(templateId, isActive) {
-        //     $.ajax({
-        //         url: "/API/Templates/ChangeActiveStatus/" + templateId,
-        //         method: 'POST',
-        //         contentType: 'application/json',
-        //         data: JSON.stringify(isActive),
-        //         success: function (response) {
-        //             console.log("hhhhhhhhhhhhhhhhh");
-        //             window.location.reload();
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.error(xhr.responseText);
-        //         }
-        //     });
-        // }
-        // function updateStatus(templateId, statusId) {
-        //     $.ajax({
-        //         url: "/api/Templates/ChangeStatus/" + templateId + "/" + statusId,
-        //         method: 'PUT',
-        //         contentType: 'application/json',
-        //         success: function (response) {
-        //             console.log(response);
-
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.error(xhr.responseText);
-        //         }
-        //     });
-        // }
-
-        // function deleteTemplate(templateTitle, templateId) {
-        //     var id = Number(templateId);
-
-        //     swal.fire({
-        //         title: 'Are you sure?',
-        //         type: 'warning',
-        //         text: "Are you sure you want to delete " + templateTitle + "?",
-        //         showCancelButton: true,
-        //         confirmButtonColor: 'red',
-        //         confirmButtonText: 'Yes',
-        //         cancelButtonText: 'cancel',
-        //         reverseButtons: true
-        //     }).then(function (result) {
-        //         if (result.value) {
-        //             $.ajax({
-        //                 url: "/API/Templates/Delete/" + templateId,
-        //                 method: "DELETE",
-        //                 dataType: "JSON",
-        //                 success: function (data) {
-        //                     console.log(data);
-        //                     window.location.reload();
-        //                 },
-        //                 error: function () {
-
-        //                 }
-        //             });
-        //         }
-        //     });
-        // }
-
-
-        // function toggleApprovedStatus(itemId)
-        // {
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: `/API/Templates/ChangeApprovedStatus?id=${itemId}`,
-        //         success: function (response)
-        //         {
-        //            console.log(response);
-
-        //         },
-        //         error: function () {
-        //             console.error('Error checking MediaTag name.');
-        //         }
-        //     });
-        // }
-
+        let table = new DataTable('#ScheduleTable', {
+             responsive: true,
+             stripe: true, 
+             
+         });
     </script>
 }

@@ -75,7 +75,6 @@ namespace HCAS.Services.PaymentServices
                     ?? throw new KeyNotFoundException($"Payment with ID {paymentDto.ID} not found.");
 
                 payment.AppointmentID = paymentDto.AppointmentID;
-                payment.PatientID = paymentDto.PatientID;
                 payment.Amount = paymentDto.Amount;
                 payment.PaymentDate = paymentDto.PaymentDate;
                 payment.PaymentMethod = paymentDto.PaymentMethod;
@@ -112,9 +111,9 @@ namespace HCAS.Services.PaymentServices
         {
             try
             {
-                var payments = await _dbContext.Payments
-                    .Include(p => p.Patient)     
+                var payments = await _dbContext.Payments     
                     .Include(p => p.Appointment)
+                    .ThenInclude(a => a.Patient)
                     .Select(p => new PaymentDto
                     {
                         ID = p.ID,
@@ -123,8 +122,8 @@ namespace HCAS.Services.PaymentServices
                         PaymentMethod = p.PaymentMethod,
                         Patient = new PatientDto
                         {
-                            FullName = p.Patient.FullName,
-                            PhoneNumber = p.Patient.PhoneNumber
+                            FullName = p.Appointment.Patient.FullName,
+                            PhoneNumber = p.Appointment.Patient.PhoneNumber
                         },
                         Appointment = new AppointmentDto
                         {

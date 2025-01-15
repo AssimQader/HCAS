@@ -11,13 +11,10 @@ namespace HCAS.Services.PatientServices
     {
         Task<List<PatientDto>> GetAll();
         Task<PatientDto> GetById(int id);
-        Task<bool> AddPatient(PatientDto patientDto);
+        Task<int> AddPatient(PatientDto patientDto);
         Task<bool> UpdatePatient(PatientDto patientDto);
         Task<bool> DeletePatient(int id);
         Task<List<AppointmentDto>> GetAppointmentsByPatientId(int patientId);
-        Task<List<PaymentDto>> GetPaymentsByPatientId(int patientId);
-
-
         Task<bool> IsPhoneNumberExists(string phoneNum);
 
     }

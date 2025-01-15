@@ -16,5 +16,8 @@ namespace HCAS.Services.DoctorScheduleServices
         Task<bool> UpdateSchedule(DoctorScheduleDto schedule);
         Task<bool> DeleteSchedule(int id);
         Task<List<DoctorScheduleDto>> GetSchedulesByDoctorId(int doctorId);
+
+        Task<bool> IsDoctorScheduledOnDay(int doctorId, string dayOfWeek);
+        Task<bool> IsSlotAvailable(int doctorId, string day, TimeSpan startTime, TimeSpan endTime);
     }
 }

@@ -17,5 +17,6 @@ namespace HCAS.Services.AppointmentServices
         Task<PatientDto> GetPatientByAppointmentId(int appointmentId);
         Task<DoctorDto> GetDoctorByAppointmentId(int appointmentId);
         Task<List<AppointmentDto>> GetAppointmentDoctorPatientDetails();
+        Task<bool> IsAppointmentExists(int doctorId, DateTime startDateTime, DateTime endDateTime);
     }
 }

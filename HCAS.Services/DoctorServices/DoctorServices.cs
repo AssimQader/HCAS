@@ -35,6 +35,36 @@ namespace HCAS.Services.DoctorServices
             }
         }
 
+        public async Task<List<DoctorDto>> GetAllWithSchedules()
+        {
+            try
+            {
+                var doctors = await _dbContext.Doctors
+                    .Include(d => d.DoctorSchedules)
+                    .Select(d => new DoctorDto
+                    {
+                        ID = d.ID,
+                        FullName = d.FullName,
+                        Specialization = d.Specialization,
+                        Email = d.Email,
+                        PhoneNumber = d.PhoneNumber,
+                        DoctorSchedules = d.DoctorSchedules.Select(s => new DoctorScheduleDto
+                        {
+                            DayOfWeek = s.DayOfWeek,
+                            StartTime = DateTime.Today.Add(s.StartTime).ToString("hh:mm tt"),
+                            EndTime = DateTime.Today.Add(s.EndTime).ToString("hh:mm tt")
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                return doctors;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error fetching all doctors with schedules.", ex);
+            }
+        }
+
         public async Task<DoctorDto> GetById(int id)
         {
             try
@@ -111,8 +141,6 @@ namespace HCAS.Services.DoctorServices
         }
 
 
-
-
         //Fetches all appointments for a specific doctor
         public async Task<List<AppointmentDto>> GetAppointmentsByDoctorId(int doctorId)
         {
@@ -170,6 +198,54 @@ namespace HCAS.Services.DoctorServices
                 throw new ApplicationException($"Error checking phone number existence: {ex.Message}", ex);
             }
         }
+
+
+        public async Task<List<DoctorScheduleDto>> GetDocScheduleByDocId(int doctorId)
+        {
+            try
+            {
+                var schedules = await _dbContext.DoctorsSchedules
+                    .Where(ds => ds.DoctorID == doctorId)
+                    .Select(ds => new DoctorScheduleDto
+                    {
+                        DayOfWeek = ds.DayOfWeek,
+                        StartTime = DateTime.Today.Add(ds.StartTime).ToString("hh:mm tt"), // Convert TimeSpan to DateTime as "TimeSpan" does not support the "hh:mm tt" format with AM/PM directly. 
+                        EndTime = DateTime.Today.Add(ds.EndTime).ToString("hh:mm tt")
+                    })
+                    .ToListAsync();
+
+                return schedules;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error fetching all doctors with schedules.", ex);
+            }
+        }
+
+
+        public async Task<List<DoctorDto>> GetDocBySpecialization(string specialization)
+        {
+            try
+            {
+                var schedules = await _dbContext.Doctors
+                    .Where(d => d.Specialization == specialization)
+                    .Select(d => new DoctorDto
+                    {
+                       ID = d.ID,
+                       FullName = d.FullName
+                    })
+                    .ToListAsync();
+
+                return schedules;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error fetching all doctors with schedules.", ex);
+            }
+        }
+
+
+
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using HCAS.DTO;
+﻿using HCAS.DL;
+using HCAS.DTO;
 using HCAS.Services.DoctorServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,6 +33,7 @@ namespace Health_Clinic_Appointment_System.Controllers
         {
             return View(new DoctorDto());
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Create(DoctorDto doctorDto)
@@ -119,5 +121,77 @@ namespace Health_Clinic_Appointment_System.Controllers
             }
         }
 
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetDocBySpecialization(string spec)
+        {
+            try
+            {
+                List<DoctorDto> doctors = await _doctorService.GetDocBySpecialization(spec);
+
+                if (doctors != null && doctors.Count != 0)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        data = doctors,
+                        message = "doctors fetched successfully."
+                    });
+                }
+
+                return Json(new
+                {
+                    success = false,
+                    data = new List<DoctorDto>(),
+                    message = "No doctors found for the specified specialization!"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    data = new List<DoctorDto>(),
+                    message = $"An error occurred while fetching doctors: {ex.Message}"
+                });
+            }
+        }
+
+
+            [HttpGet]
+        public async Task<IActionResult> GetSchedule(int doctorId)
+            {
+                try
+                {
+                    List<DoctorScheduleDto> doctorSchedules = await _doctorService.GetDocScheduleByDocId(doctorId);
+
+                    if (doctorSchedules != null && doctorSchedules.Count != 0)
+                    {
+                        return Json(new
+                        {
+                            success = true,
+                            data = doctorSchedules,
+                            message = "Schedule fetched successfully."
+                        });
+                    }
+
+                    return Json(new
+                    {
+                        success = false,
+                        data = new List<DoctorScheduleDto>(), //return empty list when no schedules exist
+                        message = "No schedule found for the specified doctor."
+                    });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        data = new List<DoctorScheduleDto>(),
+                        message = $"An error occurred while fetching schedule: {ex.Message}"
+                    });
+                }
+            }
     }
 }

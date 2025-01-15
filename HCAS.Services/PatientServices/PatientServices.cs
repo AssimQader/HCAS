@@ -48,7 +48,7 @@ namespace HCAS.Services.PatientServices
             }
         }
 
-        public async Task<bool> AddPatient(PatientDto patientDto)
+        public async Task<int> AddPatient(PatientDto patientDto)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace HCAS.Services.PatientServices
                 Patient patient = Mapper.Map(patientDto);
                 await _dbContext.Patients.AddAsync(patient);
                 int affectedRows = await _dbContext.SaveChangesAsync();
-                return affectedRows > 0;
+                return patient.ID;
             }
             catch (Exception ex)
             {
@@ -77,7 +77,6 @@ namespace HCAS.Services.PatientServices
                 patient.FullName = patientDto.FullName;
                 patient.Email = patientDto.Email;
                 patient.PhoneNumber = patientDto.PhoneNumber;
-                patient.DateOfBirth = patientDto.DateOfBirth;
                 patient.Gender = patientDto.Gender;
 
                 _dbContext.Patients.Update(patient);
@@ -124,25 +123,6 @@ namespace HCAS.Services.PatientServices
             catch (Exception ex)
             {
                 throw new ApplicationException($"Error fetching appointments for patient with ID {patientId}.", ex);
-            }
-        }
-
-        public async Task<List<PaymentDto>> GetPaymentsByPatientId(int patientId)
-        {
-            try
-            {
-                List<Payment> payments = await _dbContext.Payments
-                    .Where(p => p.PatientID == patientId)
-                    .ToListAsync();
-
-                if (payments == null || payments.Count == 0)
-                    return [];
-
-                return Mapper.Map(payments);
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException($"Error fetching payments for patient with ID {patientId}.", ex);
             }
         }
 

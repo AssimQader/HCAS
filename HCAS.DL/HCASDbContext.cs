@@ -19,12 +19,6 @@ namespace HCAS.DL
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Payment>()
-                 .HasOne(p => p.Patient)
-                 .WithMany(p => p.Payments)
-                 .HasForeignKey(p => p.PatientID)
-                 .OnDelete(DeleteBehavior.NoAction);  //no action as i need the payment data of patient even if he is deleted from database
-
 
             //add non-clustere indexes//
             builder.Entity<Appointment>()

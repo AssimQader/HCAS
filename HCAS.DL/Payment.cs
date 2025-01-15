@@ -17,9 +17,6 @@ namespace HCAS.DL
         public int AppointmentID { get; set; } // Foreign Key
 
         [Required]
-        public int PatientID { get; set; } // Foreign Key
-
-        [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0")]
         public decimal Amount { get; set; }
 
@@ -38,8 +35,5 @@ namespace HCAS.DL
         //Navigation Properties
         [ForeignKey("AppointmentID")]
         public virtual Appointment? Appointment { get; set; } = default!;
-
-        [ForeignKey("PatientID")]
-        public virtual Patient? Patient { get; set; } = default!; //one to one with appointment
     }
 }

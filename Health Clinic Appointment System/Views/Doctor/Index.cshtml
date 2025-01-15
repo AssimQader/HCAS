@@ -12,6 +12,8 @@
     </style>
 }
 
+
+
 <div class="row mb-3">
     <div class="card">
         <div class="card-body">
@@ -38,42 +40,40 @@
     </div>
 </div>
 
+
+
 <div class="row mb-3">
     <div class="card">
         <div class="card-body">
             <table id="DoctorsTable" class="display text-center" style="width:100%;">
                 <thead>
                     <tr>
-                        <th hidden>Id</th>
-                        <th style="text-align: center;">Name</th>
-                        <th style="text-align: center;">Specialization</th>
-                        <th style="text-align: center;">Email</th>
-                        <th style="text-align: center;">PhoneNumber</th>
-                        <th style="text-align: center;">Options</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Options</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @foreach (var doctor in Model)
                     {
                         <tr>
-                            <td hidden>@item.ID</td>
+                            <td>@doctor.FullName</td>
+                            <td>@doctor.Specialization</td>
+                            <td>@doctor.Email</td>
+                            <td>@doctor.PhoneNumber</td>
                             <td>
-                                @item.FullName
-                            </td>
-                            <td>
-                                @item.Specialization
-                            </td>
-                            <td>
-                                @item.Email
-                            </td>
-                            <td>
-                                @item.PhoneNumber
-                            </td>
-                            <td>
-                                <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="Edit" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                <button type="button"
+                                        class="btn btn-sm btn-primary view-schedule-btn"
+                                        data-id="@doctor.ID"
+                                        data-name="@doctor.FullName">
+                                    <i class="fa-solid fa-calendar-alt" style="margin-right:2px;"></i> Schedule
+                                </button>
+                                <a type="button" class="btn btn-sm" asp-controller="Doctor" asp-action="Edit" asp-route-Id="@doctor.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                     <i class="fa-solid fa-pen fa-red"></i>
                                 </a>
-                                <a class="btn btn-sm" onclick="deleteTemplate(@item.ID)" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                <a class="btn btn-sm" onclick="deleteTemplate(@doctor.ID)" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                                     <i class="fa-solid fa-trash" style="color:red;"></i>
                                 </a>
                             </td>
@@ -87,7 +87,47 @@
 
 
 
-@* add doctor modal *@
+
+<!-- Modal for Viewing Doctor's Schedules -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Doctor's Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Doctor's Name -->
+                <div class="mb-3">
+                    <h4 id="doctorName" class="fw-bold text-primary text-center"></h4>
+                </div>
+
+                <!-- Schedule Table -->
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Available Day</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleDetails">
+                        <!-- Schedule details will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@* Modal for Adding new doctor *@
 <div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -108,22 +148,21 @@
                             <div class="mb-3 position-relative">
                                 <label for="Email" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="Email" name="Email" required />
-                                <div class="invalid-feedback"></div>  <!-- Empty div for dynamic error message -->
+                                <div class="invalid-feedback"></div> <!-- Dynamic error message -->
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3 position-relative">
                                 <label for="PhoneNumber" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+201061103073" min="11" required />
-                                <div class="invalid-feedback"></div> <!-- Empty div for dynamic error message -->
+                                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="+201061103073" required />
+                                <div class="invalid-feedback"></div> <!-- Dynamic error message -->
                             </div>
                         </div>
-
                         <!-- Specialization -->
                         <div class="col-md-6">
                             <div class="mb-3 position-relative">
                                 <label for="Specialization" class="form-label">Specialization</label>
-                                <select class="form-select" id="Specialization" name="Specialization" required style="max-height: 150px; overflow-y: auto;">
+                                <select class="form-select" id="Specialization" name="Specialization" required>
                                     <option value="" selected disabled>Select Specialization</option>
                                     <option value="Cardiologist">Cardiologist</option>
                                     <option value="Orthopedist">Orthopedist</option>
@@ -137,10 +176,17 @@
                                     <option value="Surgeon">Surgeon</option>
                                     <option value="Plastic Surgeon">Plastic Surgeon</option>
                                 </select>
-                                <div class="invalid-feedback">
-                                    Please select a valid specialization.
-                                </div>
+                                <div class="invalid-feedback">Please select a valid specialization.</div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Doctor Schedules Section -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h6>Available Schedules</h6>
+                            <div id="scheduleContainer"></div>
+                            <button type="button" class="btn btn-outline-primary mt-3" id="addScheduleBtn">+ Add Schedule</button>
                         </div>
                     </div>
                 </div>
@@ -155,6 +201,7 @@
 
 
 
+
 @section scripts {
     <script src="~/lib/dataTable/jquery.dataTables.js"></script>
     <script src="~/js/Doctor/Doctor.js"></script>
@@ -166,6 +213,8 @@
                 responsive: true
             });
         });
+
+
 
         // function toggleActiveStatus(templateId, isActive) {
         //     $.ajax({

@@ -33,6 +33,7 @@ namespace Health_Clinic_Appointment_System.Controllers
             return View();
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Create(PatientDto patientDto)
         {
@@ -41,8 +42,12 @@ namespace Health_Clinic_Appointment_System.Controllers
 
             try
             {
-                await _patientService.AddPatient(patientDto);
-                return Json(new { success = true, message = "Patient added successfully!" }); //return json to the success method of Ajax call in js file
+                int patientId = await _patientService.AddPatient(patientDto);
+                return Json(new { 
+                    success = true, 
+                    message = "Patient added successfully!" ,
+                    id = patientId
+                }); //return json to the success method of Ajax call in js file
             }
             catch (Exception ex)
             {
@@ -50,6 +55,7 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
@@ -100,7 +106,6 @@ namespace Health_Clinic_Appointment_System.Controllers
 
 
 
-
         [HttpGet]
         public async Task<IActionResult> CheckPhoneExists(string phoneNum)
         {
@@ -121,5 +126,8 @@ namespace Health_Clinic_Appointment_System.Controllers
                 return Json(new { exists = false, message = $"An error occurred while checking the phone number: {ex.Message}" });
             }
         }
+
+
+
     }
 }

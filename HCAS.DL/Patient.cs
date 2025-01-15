@@ -23,8 +23,6 @@ namespace HCAS.DL
         [RegularExpression(@"^\+2?[1-9]\d{1,14}$", ErrorMessage = "Invalid phone number format.")]
         public string PhoneNumber { get; set; } = string.Empty; //international format (E.164)
 
-        [Required]
-        public DateOnly DateOfBirth { get; set; }
 
         [Required]
         [MaxLength(10)]
@@ -36,6 +34,5 @@ namespace HCAS.DL
 
         //Navigation Properties
         public virtual ICollection<Appointment>? Appointments { get; set; } = [];
-        public virtual ICollection<Payment>? Payments { get; set; } = [];
     }
 }
