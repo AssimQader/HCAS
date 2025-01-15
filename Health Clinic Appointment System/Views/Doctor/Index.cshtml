@@ -64,12 +64,12 @@
                             <td>@doctor.Email</td>
                             <td>@doctor.PhoneNumber</td>
                             <td>
-                                <button type="button"
-                                        class="btn btn-sm btn-primary view-schedule-btn"
-                                        data-id="@doctor.ID"
-                                        data-name="@doctor.FullName">
-                                    <i class="fa-solid fa-calendar-alt" style="margin-right:2px;"></i> Schedule
-                                </button>
+                                <i class="fa-solid fa-calendar-alt view-schedule-btn"
+                                   style="margin-right:2px; color:blue; cursor: pointer;"
+                                   data-id="@doctor.ID"
+                                   data-name="@doctor.FullName"
+                                   title="View Schedule">
+                                </i>
                                 <a type="button" class="btn btn-sm" asp-controller="Doctor" asp-action="Edit" asp-route-Id="@doctor.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                     <i class="fa-solid fa-pen fa-red"></i>
                                 </a>

@@ -70,7 +70,7 @@
                                 @item.Gender
                             </td>
                             <td>
-                                <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="Edit" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                <a type="button" href="#" class="btn btn-sm edit-patient-btn" data-id="@item.ID" data-bs-placement="top" data-bs-toggle="modal" data-bs-target="#addPatientModal" title="Edit">
                                     <i class="fa-solid fa-pen fa-red"></i>
                                 </a>
                                 <a class="btn btn-sm" onclick="deleteTemplate(@item.ID)" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
@@ -142,7 +142,7 @@
 
 @section scripts {
     <script src="~/lib/dataTable/jquery.dataTables.js"></script>
-    <script src="~/js/Patient/patient.js"></script>
+    <script src="~/js/Patient/Index.js"></script>
 
     <script>
         $(function () {

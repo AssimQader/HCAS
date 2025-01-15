@@ -1,4 +1,5 @@
-﻿using HCAS.DTO;
+﻿using HCAS.DL;
+using HCAS.DTO;
 using HCAS.Services.PatientServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -62,14 +63,26 @@ namespace Health_Clinic_Appointment_System.Controllers
         {
             try
             {
-                PatientDto patient = await _patientService.GetById(id);
-                return View(patient);
+                var patient = await _patientService.GetById(id);
+                if (patient == null)
+                {
+                    return NotFound();
+                }
+
+                return Json(new
+                {
+                    fullName = patient.FullName,
+                    email = patient.Email,
+                    phoneNumber = patient.PhoneNumber,
+                    gender = patient.Gender
+                });
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Index");
+                return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Edit(PatientDto patientDto)
@@ -79,12 +92,25 @@ namespace Health_Clinic_Appointment_System.Controllers
 
             try
             {
-                // Update patient
-                await _patientService.UpdatePatient(patientDto);
-                return RedirectToAction("Index");
+                bool result = await _patientService.UpdatePatient(patientDto);
+                if (!result)
+                {
+                    return Json(new 
+                    { 
+                        success = false, 
+                        message = $"Faild to update the patient {patientDto.FullName}'s details! please try again." 
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Patient updated successfully!",
+                });
             }
             catch (Exception ex)
             {
+                return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" }); //return json to the error method of Ajax call in js file
                 throw;
             }
         }
@@ -107,7 +133,7 @@ namespace Health_Clinic_Appointment_System.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> CheckPhoneExists(string phoneNum)
+        public async Task<IActionResult> CheckPhoneExists2(string phoneNum)
         {
             try
             {
@@ -127,6 +153,36 @@ namespace Health_Clinic_Appointment_System.Controllers
             }
         }
 
+
+
+        public async Task<IActionResult> CheckPhoneExists(string phoneNum)
+        {
+            try
+            {
+                int patientId = await _patientService.GetPatientIdByPhoneNumber(phoneNum);
+
+                if (patientId != 0)
+                {
+                    return Json(new
+                    {
+                        exists = true,
+                        patientID = patientId,
+                        message = "Phone number exists in the system."
+                    });
+                }
+
+                return Json(new
+                {
+                    exists = false,
+                    patientId = 0,
+                    message = "Phone number not found."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { exists = false, message = $"An error occurred: {ex.Message}" });
+            }
+        }
 
 
     }

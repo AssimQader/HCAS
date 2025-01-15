@@ -119,8 +119,8 @@
                 <input type="time" class="form-control schedule-end-time" required />
                 <div class="invalid-feedback">Please select a valid end time.</div>
             </div>
-            <div class="col-md-2 text-end">
-                <button type="button" class="btn btn-danger remove-schedule-btn">Remove</button>
+            <div class="col-md-1" style="margin-top:44px; cursor: pointer;">
+             <i class="fa-solid fa-trash remove-schedule-btn" style="color:red;"></i>
             </div>
         `;
 
