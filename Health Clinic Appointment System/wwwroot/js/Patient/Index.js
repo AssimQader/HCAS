@@ -218,7 +218,7 @@
 
                     //update modal title and submit button texts
                     document.getElementById("addPatientModalLabel").textContent = "Edit Patient";
-                    document.querySelector("#addPatientForm button[type='submit']").textContent = "Update Patient";
+                    document.querySelector("#addPatientForm button[type='submit']").textContent = "Save Changes";
 
                     const modal = new bootstrap.Modal(document.getElementById("addPatientModal"));
                     modal.show();
@@ -237,3 +237,21 @@
         });
     });
 })();
+
+
+
+document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function ()
+{
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
+    }
+
+    document.activeElement.blur();
+
+    //reset the modal content
+    const form = document.getElementById('addPatientForm');
+    form.reset();
+    form.classList.remove('was-validated');
+    document.getElementById('addPatientModalLabel').textContent = 'Add New Patient';
+});
