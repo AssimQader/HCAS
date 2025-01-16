@@ -117,16 +117,31 @@ namespace Health_Clinic_Appointment_System.Controllers
 
 
 
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                await _patientService.DeletePatient(id);
-                return RedirectToAction("Index");
+                bool result = await _patientService.DeletePatient(id);
+                
+                if (result)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Patient removed successfully."
+                    });
+                }
+
+                return Json(new
+                {
+                    success = false,
+                    message = "An error occurred!"
+                });
             }
             catch (Exception ex)
             {
-                throw;
+                return Json(new { success = false, message = $"An error occurred: {ex.Message}" });
             }
         }
 

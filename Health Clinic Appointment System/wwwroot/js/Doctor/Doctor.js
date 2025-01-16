@@ -252,3 +252,63 @@ document.getElementById("addDoctorForm").addEventListener("submit", async functi
         console.error(error);
     }
 });
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".delete-doctor-btn");
+
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", async function () {
+            const doctorId = this.getAttribute("data-id");
+
+            const confirmation = await Swal.fire({
+                title: "Are you sure?",
+                text: "You are about to remove this doctor.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: "Cancel",
+            });
+
+            if (confirmation.isConfirmed) {
+                try {
+                    const response = await fetch(`/Doctor/Delete?id=${doctorId}`, {
+                        method: "GET",
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        await Swal.fire({
+                            title: "Deleted!",
+                            text: result.message,
+                            icon: "success",
+                            confirmButtonText: "OK",
+                        });
+
+                        location.reload();
+                    }
+                    else {
+                        Swal.fire({
+                            title: "Error!",
+                            text: result.message,
+                            icon: "error",
+                            confirmButtonText: "OK",
+                        });
+                    }
+                }
+                catch (error) {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "An unexpected error occurred while trying to delete the doctor!",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+            }
+        });
+    });
+});
