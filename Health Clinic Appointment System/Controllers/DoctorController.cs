@@ -25,7 +25,7 @@ namespace Health_Clinic_Appointment_System.Controllers
             {
                 throw;
             }
-        }
+        }  
 
 
         [HttpGet]
