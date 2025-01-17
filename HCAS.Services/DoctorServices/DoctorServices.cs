@@ -69,10 +69,27 @@ namespace HCAS.Services.DoctorServices
         {
             try
             {
-                Doctor doctor = await _dbContext.Doctors.FindAsync(id);
-                return doctor == null 
-                    ? throw new KeyNotFoundException($"Doctor with ID {id} not found.")
-                    : Mapper.Map(doctor);
+                var doctor = await _dbContext.Doctors
+                    .Include(d => d.DoctorSchedules)
+                    .Where(d => d.ID == id)
+                    .Select(d => new DoctorDto
+                    {
+                        ID = d.ID,
+                        FullName =d.FullName,
+                        Specialization = d.Specialization,
+                        Email = d.Email,
+                        PhoneNumber = d.PhoneNumber,
+                        DoctorSchedules = d.DoctorSchedules.Select(ds => new DoctorScheduleDto
+                        {
+                            DayOfWeek = ds.DayOfWeek,
+                            StartTime = DateTime.Today.Add(ds.StartTime).ToString("HH:mm"),
+                            EndTime = DateTime.Today.Add(ds.EndTime).ToString("HH:mm")
+                        }).ToList(),    
+                    })
+                    .FirstOrDefaultAsync();
+
+
+                return doctor ?? throw new KeyNotFoundException($"Doctor with ID {id} not found.");
             }
             catch (Exception ex)
             {

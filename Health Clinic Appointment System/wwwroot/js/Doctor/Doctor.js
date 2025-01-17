@@ -165,20 +165,62 @@
                     document.getElementById("PhoneNumber").value = doc.phoneNumber || "";
                     document.getElementById("Specialization").value = doc.specialization || "";
 
-                    //update modal title and submit button texts
+                    // Clear existing schedules
+                    const scheduleContainer = document.getElementById("scheduleContainer");
+                    scheduleContainer.innerHTML = "";
+
+                    // Populate existing schedules
+                    if (doc.doctorSchedules && doc.doctorSchedules.length > 0)
+                    {
+                        doc.doctorSchedules.forEach(schedule => {
+                            const row = document.createElement("div");
+                            row.classList.add("row", "g-3", "align-items-center", "mb-3");
+                            row.innerHTML = `
+                            <div class="col-md-4">
+                                <label class="form-label">Day of Week</label>
+                                <select class="form-select schedule-day" required>
+                                    <option value="" disabled>Select Day</option>
+                                    <option value="Monday" ${schedule.dayOfWeek === "Monday" ? "selected" : ""}>Monday</option>
+                                    <option value="Tuesday" ${schedule.dayOfWeek === "Tuesday" ? "selected" : ""}>Tuesday</option>
+                                    <option value="Wednesday" ${schedule.dayOfWeek === "Wednesday" ? "selected" : ""}>Wednesday</option>
+                                    <option value="Thursday" ${schedule.dayOfWeek === "Thursday" ? "selected" : ""}>Thursday</option>
+                                    <option value="Friday" ${schedule.dayOfWeek === "Friday" ? "selected" : ""}>Friday</option>
+                                    <option value="Saturday" ${schedule.dayOfWeek === "Saturday" ? "selected" : ""}>Saturday</option>
+                                    <option value="Sunday" ${schedule.dayOfWeek === "Sunday" ? "selected" : ""}>Sunday</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a day.</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Start Time</label>
+                                <input type="time" class="form-control schedule-start-time" value="${schedule.startTime}" required />
+                                <div class="invalid-feedback">Please select a valid start time.</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">End Time</label>
+                                <input type="time" class="form-control schedule-end-time" value="${schedule.endTime}" required />
+                                <div class="invalid-feedback">Please select a valid end time.</div>
+                            </div>
+                            <div class="col-md-1" style="margin-top:44px; cursor: pointer;">
+                                <i class="fa-solid fa-trash remove-schedule-btn" style="color:red;"></i>
+                            </div>
+                        `;
+
+                            scheduleContainer.appendChild(row);
+                        });
+                    }
+
+                    // Update modal title and submit button texts
                     document.getElementById("addDoctorModalLabel").textContent = "Edit Doctor";
                     document.querySelector("#addDoctorForm button[type='submit']").textContent = "Save Changes";
 
                     const modal = new bootstrap.Modal(document.getElementById("addDoctorModal"));
                     modal.show();
                 }
-                else
-                {
+                else {
                     throw new Error("Failed to fetch doctor data!");
                 }
             }
-            catch (error)
-            {
+            catch (error) {
                 Swal.fire({
                     icon: "error",
                     title: "Error!",
@@ -193,10 +235,105 @@
 
 
 
+
     // Real-time validation for all inputs
     const inputs = document.querySelectorAll("input, select");
     inputs.forEach((input) => {
         input.addEventListener("blur", () => validateInput(input));
+    });
+
+
+
+
+
+
+
+    // Form submission handler
+    document.getElementById("addDoctorForm").addEventListener("submit", async function (event) {
+        event.preventDefault(); // Prevent default form submission
+        let isFormValid = true;
+
+        // Validate all inputs
+        const inputs = document.querySelectorAll("#addDoctorForm input, #addDoctorForm select");
+        inputs.forEach((input) => {
+            validateInput(input);
+            if (!input.classList.contains("is-valid")) {
+                isFormValid = false;
+            }
+        });
+
+        if (!isFormValid) {
+            event.stopPropagation();
+            return; // Stop the process if the form is invalid
+        }
+
+        const form = this;
+        const formData = new FormData(form);
+
+        // If editing, append the doctor ID
+        if (currentDoctorId) {
+            formData.append("ID", currentDoctorId);
+        }
+
+        // Collect all schedules data
+        const scheduleRows = document.querySelectorAll("#scheduleContainer .row");
+        if (scheduleRows.length !== 0) {
+            scheduleRows.forEach((row, index) => {
+                const DayOfWeek = row.querySelector(".schedule-day").value;
+                const StartTime = row.querySelector(".schedule-start-time").value + ":00"; // Ensure hh:mm:ss format
+                const EndTime = row.querySelector(".schedule-end-time").value + ":00"; // Ensure hh:mm:ss format
+
+                if (DayOfWeek && StartTime && EndTime) {
+                    formData.append(`DoctorSchedules[${index}].DayOfWeek`, DayOfWeek);
+                    formData.append(`DoctorSchedules[${index}].StartTime`, StartTime);
+                    formData.append(`DoctorSchedules[${index}].EndTime`, EndTime);
+                }
+            });
+        }
+
+        try {
+            const url = currentDoctorId ? `/Doctor/Edit` : `/Doctor/Create`;
+            const response = await fetch(url, {
+                method: "POST",
+                body: formData,
+            });
+
+            // Check if the response is valid
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: result.message,
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    form.reset();
+                    currentDoctorId = null;
+                    document.getElementById("addDoctorModal").click(); // Close the modal
+                    location.reload(); // Reload the page to reflect changes
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: result.message,
+                    confirmButtonText: "OK",
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: "An unexpected error occurred!",
+                confirmButtonText: "OK",
+            });
+            console.error("Error:", error);
+        }
     });
 })();
 
@@ -252,101 +389,6 @@ $(document).on("click", ".view-schedule-btn", async function ()
 });
 
 
-
-
-// Form submission handler
-document.getElementById("addDoctorForm").addEventListener("submit", async function (event) {
-    let isFormValid = true;
-
-    inputs.forEach((input) => {
-        validateInput(input);
-
-        if (!input.classList.contains("is-valid")) {
-            isFormValid = false;
-        }
-    });
-
-    if (!isFormValid || !form.checkValidity())
-    {
-        event.preventDefault(); //prevent form submission
-        event.stopPropagation();
-        return;
-    }
-
-    form.classList.add('was-validated');
-
-    const form = this;
-    const formData = new FormData(form);
-
-    if (currentDoctorId) //if it has a value that means user in EDIT proccess
-    {
-        formData.append("ID", currentDoctorId); //append the ID to send with doctor object to database
-    }
-
-    // Collect all schedules data
-    document.querySelectorAll("#scheduleContainer .row").forEach((row, index) => {
-        const DayOfWeek = row.querySelector(".schedule-day").value;
-        const StartTime = row.querySelector(".schedule-start-time").value + ":00"; // Ensure hh:mm:ss format
-        const EndTime = row.querySelector(".schedule-end-time").value + ":00"; // Ensure hh:mm:ss format
-
-        /*
-          Key-Value Binding: The DoctorSchedules list is sent using keys that ASP.NET Core can map to the List<DoctorScheduleDto> property. 
-          For example, the first schedule is sent as:
-          DoctorSchedules[0].DayOfWeek = "Monday"
-          DoctorSchedules[0].StartTime = "14:00:00"
-          DoctorSchedules[0].EndTime = "17:00:00"
-        */
-        if (DayOfWeek && StartTime && EndTime) {
-            formData.append(`DoctorSchedules[${index}].DayOfWeek`, DayOfWeek);
-            formData.append(`DoctorSchedules[${index}].StartTime`, StartTime);
-            formData.append(`DoctorSchedules[${index}].EndTime`, EndTime);
-        }
-    });
-
-    try {
-        const url = currentDoctorId ? `/Doctor/Edit` : `/Doctor/Create`;
-        const response = await fetch(url, {
-            method: "POST",
-            body: formData
-        });
-
-        const result = await response.json();
-
-        if (result.success)
-        {
-            Swal.fire({
-                icon: "success!",
-                title: "Success!",
-                text: result.message,
-                confirmButtonText: "OK",
-            }).then(() => {
-                form.reset();
-                currentDoctorId = null; //reset currentDoctorId
-                document.getElementById("addDoctorModal").click();
-                location.reload();
-            });
-
-        }
-        else {
-            Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: result.message,
-                confirmButtonText: "OK",
-            });
-        }
-    }
-    catch (error)
-    {
-        Swal.fire({
-            icon: "error",
-            title: "Error!",
-            text: "An unexpected error occurred!",
-            confirmButtonText: "OK",
-        });
-        console.error("Error:", error);
-    }
-});
 
 
 

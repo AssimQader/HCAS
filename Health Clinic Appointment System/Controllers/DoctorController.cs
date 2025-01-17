@@ -38,8 +38,6 @@ namespace Health_Clinic_Appointment_System.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(DoctorDto doctorDto)
         {
-            if (!ModelState.IsValid)
-                return View(doctorDto);
 
             try
             {
@@ -76,7 +74,8 @@ namespace Health_Clinic_Appointment_System.Controllers
                     fullName = doctor.FullName,
                     email = doctor.Email,
                     phoneNumber = doctor.PhoneNumber,
-                    specialization = doctor.Specialization
+                    specialization = doctor.Specialization,
+                    doctorSchedules = doctor.DoctorSchedules
                 });
             }
             catch (Exception ex)
@@ -102,6 +101,7 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
+
 
 
         [HttpGet]

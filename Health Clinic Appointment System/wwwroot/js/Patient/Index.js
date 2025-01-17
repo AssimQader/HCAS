@@ -179,7 +179,9 @@
                     document.getElementById("addPatientModal").click();
                     location.reload();
                 });
-            } else {
+            }
+            else
+            {
                 Swal.fire({
                     icon: "error",
                     title: "Error!",

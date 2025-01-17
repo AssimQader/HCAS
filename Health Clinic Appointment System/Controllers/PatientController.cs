@@ -44,7 +44,8 @@ namespace Health_Clinic_Appointment_System.Controllers
             try
             {
                 int patientId = await _patientService.AddPatient(patientDto);
-                return Json(new { 
+                return Json(new
+                { 
                     success = true, 
                     message = "Patient added successfully!" ,
                     id = patientId
