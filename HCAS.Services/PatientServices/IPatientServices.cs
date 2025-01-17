@@ -17,6 +17,6 @@ namespace HCAS.Services.PatientServices
         Task<List<AppointmentDto>> GetAppointmentsByPatientId(int patientId);
         Task<bool> IsPhoneNumberExists(string phoneNum);
         Task<int> GetPatientIdByPhoneNumber(string phoneNumber);
-
+        Task<List<PatientDto>> GetAllWithAppointments();
     }
 }

@@ -88,16 +88,31 @@ namespace Health_Clinic_Appointment_System.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(DoctorDto doctorDto)
         {
+
             if (!ModelState.IsValid)
                 return View(doctorDto);
 
             try
             {
-                await _doctorService.UpdateDoctor(doctorDto);
-                return RedirectToAction("Index");
+                bool result = await _doctorService.UpdateDoctor(doctorDto);
+                if (!result)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"Faild to update Dr. {doctorDto.FullName}'s details! please try again."
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Doctor's data updated successfully!",
+                });
             }
             catch (Exception ex)
             {
+                return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" }); //return json to the error method of Ajax call in js file
                 throw;
             }
         }

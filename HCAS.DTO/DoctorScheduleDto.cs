@@ -13,6 +13,8 @@ namespace HCAS.DTO
         public string StartTime { get; set; } 
         public string EndTime { get; set; }
 
+        public int? DocId { get; set; }
+
         public DoctorDto? Doctor { get; set; }
     }
 }

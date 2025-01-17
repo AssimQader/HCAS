@@ -41,10 +41,10 @@
                     <div class="btn-group" role="group" aria-label="Vertical radio toggle button group">
                         &nbsp;
                         <input type="radio" class="btn-check" name="viewOption-radio" id="viewAsTable" autocomplete="off">
-                        <label class="btn btn-outline-secondary" for="viewAsTable">view as Table</label>
+                        <label id="TableView" class="btn btn-outline-secondary" for="viewAsTable">Table View</label>
 
                         <input type="radio" class="btn-check" name="viewOption-radio" id="viewAsCalender" autocomplete="off" checked>
-                        <label class="btn btn-outline-secondary" for="viewAsCalender">view as Calender</label>
+                        <label id="CalenderView" class="btn btn-outline-secondary" for="viewAsCalender">Calender View</label>
                     </div>
                     &nbsp;
                     <button id="btnGroupDrop1" type="button" onclick="showHideAddEventForm()" class="btn btn-primary btn-style-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -301,7 +301,14 @@
         let table = new DataTable('#ScheduleTable', {
              responsive: true,
              stripe: true, 
-             
          });
+
+             // Set the min attribute dynamically for calender
+        document.addEventListener("DOMContentLoaded", function ()
+        {
+            const dateInput = document.getElementById("Date");
+            const today = new Date().toISOString().split('T')[0]; //get today's date in yyyy-mm-dd format
+            dateInput.setAttribute("min", today); //set the min attribute to today's date
+        });
     </script>
 }

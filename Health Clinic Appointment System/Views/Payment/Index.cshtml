@@ -9,7 +9,46 @@
 {
     <link href="~/lib/dataTable/jquery.dataTables.css" rel="stylesheet" />
     <style>
+        /* Modal Header */
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
 
+        .modal-title {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 8px;
+            background-color: #ffffff;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+        }
+
+        .pay-btn {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
     </style>
 }
 
@@ -30,7 +69,7 @@
                     </nav>
                 </div>
                 <div class="col-2 d-flex justify-content-end">
-                    <a type="button" class="btn btn-primary btn-style-light d-flex align-items-center me-2" asp-action="Create">
+                    <a type="button" id="AddPaymentBtn" href="#" class="btn btn-primary btn-style-light d-flex align-items-center me-2" data-bs-placement="top" data-bs-toggle="modal" data-bs-target="#manageAppointmentsModal">
                         <i class="fa-solid fa-plus" style="margin-right:5px;"></i>
                         Add New
                     </a>
@@ -103,92 +142,48 @@
     </div>
 </div>
 
+
+
+<!-- Patient Appointment and Payment Modal -->
+<div class="modal fade" id="manageAppointmentsModal" tabindex="-1" aria-labelledby="manageAppointmentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageAppointmentsModalLabel">Manage Appointments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Patient Selection -->
+                <div class="mb-4">
+                    <label for="patientSelect" class="form-label">Select Patient</label>
+                    <select id="patientSelect" class="form-select" aria-label="Select Patient">
+                        <option value="" disabled selected>Select a Patient..</option>
+                       
+                    </select>
+                </div>
+
+                <!-- Appointment & Payment Cards -->
+                <div id="appointmentCardsContainer" class="row g-3">
+                    <!-- Dynamically Generated Appointment Cards -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 @section scripts {
     <script src="~/lib/dataTable/jquery.dataTables.js"></script>
-    @* <script src="~/js/TemplateManagement/index.js"></script> *@
+    <script src="~/js/Payment/Index.js"></script>
+
     <script>
         $(function () {
             let table = new DataTable('#PaymentsTable', {
                 responsive: true
             });
         });
-
-        // function toggleActiveStatus(templateId, isActive) {
-        //     $.ajax({
-        //         url: "/API/Templates/ChangeActiveStatus/" + templateId,
-        //         method: 'POST',
-        //         contentType: 'application/json',
-        //         data: JSON.stringify(isActive),
-        //         success: function (response) {
-        //             console.log("hhhhhhhhhhhhhhhhh");
-        //             window.location.reload();
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.error(xhr.responseText);
-        //         }
-        //     });
-        // }
-        // function updateStatus(templateId, statusId) {
-        //     $.ajax({
-        //         url: "/api/Templates/ChangeStatus/" + templateId + "/" + statusId,
-        //         method: 'PUT',
-        //         contentType: 'application/json',
-        //         success: function (response) {
-        //             console.log(response);
-
-        //         },
-        //         error: function (xhr, status, error) {
-        //             console.error(xhr.responseText);
-        //         }
-        //     });
-        // }
-
-        // function deleteTemplate(templateTitle, templateId) {
-        //     var id = Number(templateId);
-
-        //     swal.fire({
-        //         title: 'Are you sure?',
-        //         type: 'warning',
-        //         text: "Are you sure you want to delete " + templateTitle + "?",
-        //         showCancelButton: true,
-        //         confirmButtonColor: 'red',
-        //         confirmButtonText: 'Yes',
-        //         cancelButtonText: 'cancel',
-        //         reverseButtons: true
-        //     }).then(function (result) {
-        //         if (result.value) {
-        //             $.ajax({
-        //                 url: "/API/Templates/Delete/" + templateId,
-        //                 method: "DELETE",
-        //                 dataType: "JSON",
-        //                 success: function (data) {
-        //                     console.log(data);
-        //                     window.location.reload();
-        //                 },
-        //                 error: function () {
-
-        //                 }
-        //             });
-        //         }
-        //     });
-        // }
-
-
-        // function toggleApprovedStatus(itemId)
-        // {
-        //     $.ajax({
-        //         type: 'GET',
-        //         url: `/API/Templates/ChangeApprovedStatus?id=${itemId}`,
-        //         success: function (response)
-        //         {
-        //            console.log(response);
-
-        //         },
-        //         error: function () {
-        //             console.error('Error checking MediaTag name.');
-        //         }
-        //     });
-        // }
 
     </script>
 }

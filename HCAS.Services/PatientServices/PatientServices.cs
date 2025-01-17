@@ -127,6 +127,45 @@ namespace HCAS.Services.PatientServices
         }
 
 
+        public async Task<List<PatientDto>> GetAllWithAppointments()
+        {
+            try
+            {
+                var patients = await _dbContext.Patients
+                    .AsNoTracking() //disable change tracking
+                    .Select(p => new PatientDto
+                    {
+                        ID = p.ID,
+                        FullName = p.FullName,
+                        Appointments = p.Appointments.Select(a => new AppointmentDto
+                        {
+                            ID = a.ID,
+                            PatientID = p.ID,   
+                            StartDateTime = a.StartDateTime,
+                            EndDateTime = a.EndDateTime,
+                            PaymentStatus = a.PaymentStatus,
+                            Doctor = new DoctorDto
+                            {
+                                FullName = a.Doctor.FullName,
+                                Specialization = a.Doctor.Specialization
+                            }
+                        }).ToList()
+                    })
+                    .ToListAsync();
+
+                if (patients == null || patients.Count == 0)
+                    return [];
+
+                return patients;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error fetching all patients with appointments.", ex);
+            }
+        }
+
+
+
 
 
         public async Task<bool> IsPhoneNumberExists(string phoneNumber)

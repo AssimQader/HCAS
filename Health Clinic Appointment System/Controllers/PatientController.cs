@@ -106,7 +106,7 @@ namespace Health_Clinic_Appointment_System.Controllers
                 return Json(new
                 {
                     success = true,
-                    message = "Patient updated successfully!",
+                    message = "Patient's data updated successfully!",
                 });
             }
             catch (Exception ex)
@@ -170,7 +170,7 @@ namespace Health_Clinic_Appointment_System.Controllers
         }
 
 
-
+        [HttpGet]
         public async Task<IActionResult> CheckPhoneExists(string phoneNum)
         {
             try
@@ -197,6 +197,28 @@ namespace Health_Clinic_Appointment_System.Controllers
             catch (Exception ex)
             {
                 return Json(new { exists = false, message = $"An error occurred: {ex.Message}" });
+            }
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllWithAppointments()
+        {
+            try
+            {
+                List<PatientDto> patients = await _patientService.GetAllWithAppointments();
+
+                return Json(new
+                {
+                    success = true,
+                    details = patients
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" });
+                throw;
             }
         }
 

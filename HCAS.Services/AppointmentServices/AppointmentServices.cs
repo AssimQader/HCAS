@@ -81,6 +81,7 @@ namespace HCAS.Services.AppointmentServices
                 appointment.StartDateTime = appointmentDto.StartDateTime;
                 appointment.EndDateTime = appointmentDto.EndDateTime;
                 appointment.Status = appointmentDto.Status;
+                appointment.PaymentStatus = appointmentDto.PaymentStatus;
 
                 _dbContext.Appointments.Update(appointment);
                 int affectedRows = await _dbContext.SaveChangesAsync();

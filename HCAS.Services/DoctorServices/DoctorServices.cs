@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -114,13 +115,16 @@ namespace HCAS.Services.DoctorServices
             }
         }
 
+
         public async Task<bool> UpdateDoctor(DoctorDto doctorDto)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(doctorDto);
 
-                Doctor doctor = await _dbContext.Doctors.FindAsync(doctorDto.ID)
+                Doctor doctor = await _dbContext.Doctors
+                    .Include(d => d.DoctorSchedules)
+                    .FirstOrDefaultAsync(d => d.ID == doctorDto.ID)
                     ?? throw new KeyNotFoundException($"Doctor with ID {doctorDto.ID} not found.");
 
                 doctor.FullName = doctorDto.FullName;
@@ -128,8 +132,49 @@ namespace HCAS.Services.DoctorServices
                 doctor.PhoneNumber = doctorDto.PhoneNumber;
                 doctor.Specialization = doctorDto.Specialization;
 
+
+                var existingSchedules = doctor.DoctorSchedules.ToList();
+                var incomingSchedules = doctorDto.DoctorSchedules;
+
+
+                // 1. Add new schedules that are not in the existing list
+                var schedulesToAdd = incomingSchedules
+                    .Where(dto => !existingSchedules.Any(existing =>
+                        existing.DayOfWeek == dto.DayOfWeek &&
+                        existing.StartTime == TimeSpan.Parse(dto.StartTime) &&
+                        existing.EndTime == TimeSpan.Parse(dto.EndTime)))
+                    .Select(dto => new DoctorSchedule
+                    {
+                        DayOfWeek = dto.DayOfWeek,
+                        StartTime = TimeSpan.Parse(dto.StartTime), 
+                        EndTime = TimeSpan.Parse(dto.EndTime),   
+                        DoctorID = doctor.ID,
+                        UpdatedAt = DateTime.Now
+                    })
+                    .ToList();
+
+
+                if (schedulesToAdd.Count != 0)
+                {
+                    _dbContext.DoctorsSchedules.AddRange(schedulesToAdd);
+                }
+
+
+
+                // 2. Remove schedules that are in the existing list but not in the incoming list
+                var schedulesToDelete = existingSchedules
+                    .Where(existing => !incomingSchedules.Any(dto => dto.DocId == doctorDto.ID))
+                    .ToList();
+
+                if (schedulesToDelete.Count != 0)
+                {
+                    _dbContext.DoctorsSchedules.RemoveRange(schedulesToDelete);
+                }
+
+
                 _dbContext.Doctors.Update(doctor);
                 int affectedRows = await _dbContext.SaveChangesAsync();
+
                 return affectedRows > 0;
             }
             catch (Exception ex)
@@ -137,6 +182,7 @@ namespace HCAS.Services.DoctorServices
                 throw new ApplicationException($"Error updating doctor with ID {doctorDto.ID}.", ex);
             }
         }
+
 
         public async Task<bool> DeleteDoctor(int id)
         {

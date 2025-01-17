@@ -143,8 +143,11 @@
     });
 
 
+
+
     // Add a new schedule row on button click
     document.getElementById("addScheduleBtn").addEventListener("click", addScheduleRow);
+
 
 
 
@@ -246,8 +249,6 @@
 
 
 
-
-
     // Form submission handler
     document.getElementById("addDoctorForm").addEventListener("submit", async function (event) {
         event.preventDefault(); // Prevent default form submission
@@ -291,7 +292,8 @@
             });
         }
 
-        try {
+        try
+        {
             const url = currentDoctorId ? `/Doctor/Edit` : `/Doctor/Create`;
             const response = await fetch(url, {
                 method: "POST",
@@ -336,6 +338,8 @@
         }
     });
 })();
+
+
 
 
 
@@ -387,8 +391,6 @@ $(document).on("click", ".view-schedule-btn", async function ()
         alert("Failed to load the schedule! Please try again.");
     }
 });
-
-
 
 
 

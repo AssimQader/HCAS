@@ -76,7 +76,7 @@ namespace HCAS.Services.PaymentServices
 
                 payment.AppointmentID = paymentDto.AppointmentID;
                 payment.Amount = paymentDto.Amount;
-                payment.PaymentDate = paymentDto.PaymentDate;
+                payment.PaymentDate = (DateTime)paymentDto.PaymentDate;
                 payment.PaymentMethod = paymentDto.PaymentMethod;
 
                 _dbContext.Payments.Update(payment);
@@ -107,13 +107,12 @@ namespace HCAS.Services.PaymentServices
         }
 
 
-        public async Task<List<PaymentDto>> GetPaymentPatientAppointmentDetails()
+        public async Task<List<PaymentDto>> GetPaymentDetailsData()
         {
             try
             {
-                var payments = await _dbContext.Payments     
+                var payments = await _dbContext.Payments
                     .Include(p => p.Appointment)
-                    .ThenInclude(a => a.Patient)
                     .Select(p => new PaymentDto
                     {
                         ID = p.ID,
@@ -122,6 +121,7 @@ namespace HCAS.Services.PaymentServices
                         PaymentMethod = p.PaymentMethod,
                         Patient = new PatientDto
                         {
+                            ID = p.Appointment.Patient.ID,
                             FullName = p.Appointment.Patient.FullName,
                             PhoneNumber = p.Appointment.Patient.PhoneNumber
                         },
@@ -140,7 +140,5 @@ namespace HCAS.Services.PaymentServices
                 throw new ApplicationException("Error fetching payments with patient and appointment details.", ex);
             }
         }
-
-
     }
 }

@@ -82,13 +82,46 @@ namespace Health_Clinic_Appointment_System.Controllers
             try
             {
                 AppointmentDto appointment = await _appointmentService.GetById(id);
-                return View(appointment);
+                if (appointment == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = $"Appointment with ID {id} not found!"
+                    });
+                }
+
+                appointment.PaymentStatus = "Paid";
+
+
+                bool result = await _appointmentService.UpdateAppointment(appointment);
+                if (result)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Payment status updated successfully."
+                    });
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Failed to update payment status!"
+                    });
+                }
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Index");
+                return Json(new
+                {
+                    success = false,
+                    message = $"An unexpected error occurred: {ex.Message}"
+                });
             }
         }
+
 
 
         [HttpPost]

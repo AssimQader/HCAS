@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function ()
         editable: true,
         selectable: true,
         nowIndicator: true,
-        dayMaxEvents: true, // Show "more" link when too many events
+        dayMaxEvents: true, //show "more" link when too many events
         eventTimeFormat: {
             hour: 'numeric',
             minute: '2-digit',
@@ -324,7 +324,11 @@ document.addEventListener('DOMContentLoaded', function ()
                 <div>
                     <strong>Doctor:</strong> ${info.event.extendedProps.docName}<br>
                     <strong>Patient:</strong> ${info.event.extendedProps.patientName}<br>
-                    <strong>Payment:</strong> ${info.event.extendedProps.paymentStatus}<br>
+                    <strong>Payment:
+                        <span class="badge ${info.event.extendedProps.paymentStatus === "Paid" ? "bg-success" : "bg-warning"}">
+                                 ${info.event.extendedProps.paymentStatus}
+                       </span>
+                    </strong><br>
                     <strong>Start:</strong> ${new Date(info.event.start).toLocaleString()}<br>
                     <strong>End:</strong> ${new Date(info.event.end).toLocaleString()}<br>
                 </div>
@@ -492,6 +496,7 @@ async function SavePatientToDB(appointmentFormData)
 /*------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------*/
 
+
 //change between calender and table view
 $("input[type=radio][name=viewOption-radio]").on("change", function () {
     if ($("#viewAsTable").is(":checked"))
@@ -504,6 +509,7 @@ $("input[type=radio][name=viewOption-radio]").on("change", function () {
         $("#tableView").hide();
         $("#calenderView").show();
     }
+
 });
 
 
@@ -533,57 +539,5 @@ function clearAndCloseAppointmentForm() {
 
 /*---------------------------------------------------------------------------------*/
 
-
-
-//Add new event in databse//
-function addEventAndCloseEventForm()
-{
-    if (!validateEvent()) {
-        return; // Stop further execution if validation fails
-    }
-
-    var form = {};
-    form["title"] = sceneTitleInput;
-    form["startTime"] = $("#eventStartTime").val();
-    form["durationTime"] = $("#eventDurationTime").val();
-    form["sceneId"] = Number(sceneID);
-    form["scheduleId"] = Number(scheduleID);
-
-    //add event in db
-    $.ajax({
-        url: "/API/Schedule/Module/Event/AddNew",
-        method: 'POST',
-        dataType: "json",
-        contentType: "application/json;",
-        data: JSON.stringify(form),
-        success: function (data) {
-            $("#addEventForm").toggle("hide");
-
-
-            //display event on the calender:
-            var scheduleDate = $("#scheduleSelect :selected").attr("data-startDay").split('T')[0];
-            var startEvent = scheduleDate + 'T' + form["startTime"];
-            var endTime = addTwoTimes(form["startTime"], form["durationTime"]);
-            var endEvent = scheduleDate + 'T' + endTime;
-
-            var evId = data.id.toString();
-            calendar.addEvent({
-                id: evId,
-                title: sceneTitleInput,
-                start: startEvent,
-                end: endEvent,
-                allDay: false
-            });
-
-            // Store the event in local storage
-            const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
-            storedEvents.push({ title: sceneTitleInput, start: startEvent, end: endEvent });
-            localStorage.setItem('events', JSON.stringify(storedEvents));
-        },
-        error: function () {
-            console.log("Event not saved in database!");
-        }
-    });
-}
 
 
