@@ -43,8 +43,13 @@ namespace Health_Clinic_Appointment_System.Controllers
 
             try
             {
-                await _doctorService.AddDoctor(doctorDto);
-                return Json(new { success = true, message = "Doctor added successfully!" }); //return json to the success of error methods of Ajax call in js file
+                int docId = await _doctorService.AddDoctor(doctorDto);
+                return Json(new
+                {
+                    success = true,
+                    message = "Doctor added successfully!",
+                    id = docId
+                });
             }
             catch (Exception ex)
             {
@@ -54,19 +59,32 @@ namespace Health_Clinic_Appointment_System.Controllers
         }
 
 
+
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             try
             {
                 DoctorDto doctor = await _doctorService.GetById(id);
-                return View(doctor);
+                if (doctor == null)
+                {
+                    return NotFound();
+                }
+
+                return Json(new
+                {
+                    fullName = doctor.FullName,
+                    email = doctor.Email,
+                    phoneNumber = doctor.PhoneNumber,
+                    specialization = doctor.Specialization
+                });
             }
             catch (Exception ex)
             {
-                return RedirectToAction("Index");
+                return StatusCode(500, new { message = $"An error occurred: {ex.Message}" });
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Edit(DoctorDto doctorDto)
@@ -114,28 +132,6 @@ namespace Health_Clinic_Appointment_System.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> CheckPhoneExists(string phoneNum)
-        {
-            try
-            {
-                bool isExists = await _doctorService.IsPhoneNumberExists(phoneNum);
-
-                if (isExists)
-                {
-                    return Json(new { exists = true, message = "A user with the same phone number already exists!" }); //return json object of two properties: exists, message
-                }
-
-                return Json(new { exists = false, message = "" });
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new { exists = false, message = $"An error occurred while checking the phone number: {ex.Message}" });
-            }
-        }
-
-
 
         [HttpGet]
         public async Task<IActionResult> GetDocBySpecialization(string spec)
@@ -173,7 +169,8 @@ namespace Health_Clinic_Appointment_System.Controllers
         }
 
 
-            [HttpGet]
+
+        [HttpGet]
         public async Task<IActionResult> GetSchedule(int doctorId)
             {
                 try
@@ -207,5 +204,35 @@ namespace Health_Clinic_Appointment_System.Controllers
                     });
                 }
             }
+
+
+        public async Task<IActionResult> CheckPhoneExists(string phoneNum)
+        {
+            try
+            {
+                int doctorId = await _doctorService.GetDoctorIdByPhoneNumber(phoneNum);
+
+                if (doctorId != 0)
+                {
+                    return Json(new
+                    {
+                        exists = true,
+                        doctorID = doctorId,
+                        message = "Phone number exists in the system."
+                    });
+                }
+
+                return Json(new
+                {
+                    exists = false,
+                    doctorID = 0,
+                    message = "Phone number not found."
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { exists = false, message = $"An error occurred: {ex.Message}" });
+            }
+        }
     }
 }

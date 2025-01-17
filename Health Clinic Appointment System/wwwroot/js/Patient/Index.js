@@ -18,8 +18,6 @@
 
 
 
-
-
     /**
      * Validate input field based on regex or built-in validation.
      * @param {HTMLInputElement} input -
@@ -51,11 +49,15 @@
                 input.classList.remove("is-valid");
                 feedbackDiv.textContent = validationRule.message; //set dynamic feedback message
             }
-        } else if (input.checkValidity()) {
+        }
+        else if (input.checkValidity())
+        {
             input.classList.add("is-valid");
             input.classList.remove("is-invalid");
             feedbackDiv.textContent = ""; 
-        } else {
+        }
+        else
+        {
             input.classList.add("is-invalid");
             input.classList.remove("is-valid");
             feedbackDiv.textContent = input.validationMessage;
@@ -77,7 +79,8 @@
             const response = await fetch(`/Patient/CheckPhoneExists?phoneNum=${encodeURIComponent(phoneNumber)}`);
             const result = await response.json();
 
-            if (result.exists && (!currentPatientId || result.patientID !== parseInt(currentPatientId))) {
+            if (result.exists && (!currentPatientId || result.patientID !== parseInt(currentPatientId)))
+            {
                 feedbackDiv.textContent = "A user with this phone number already exists!";
                 feedbackDiv.style.display = "block";
                 return true;
@@ -258,6 +261,8 @@ document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', f
 
 
 
+
+// Delete Patient Logic
 document.addEventListener("DOMContentLoaded", function ()
 {
     const deleteButtons = document.querySelectorAll(".delete-patient-btn");

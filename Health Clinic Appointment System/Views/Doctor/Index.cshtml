@@ -70,7 +70,7 @@
                                    data-name="@doctor.FullName"
                                    title="View Schedule">
                                 </i>
-                                <a type="button" class="btn btn-sm" asp-controller="Doctor" asp-action="Edit" asp-route-Id="@doctor.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                <a type="button" href="#" class="btn btn-sm edit-doctor-btn" data-id="@doctor.ID" data-bs-toggle="modal" data-bs-placement="top" data-bs-target="#addDoctorModal" title="Edit">
                                     <i class="fa-solid fa-pen fa-red"></i>
                                 </a>
                                 <a class="btn btn-sm delete-doctor-btn" data-id="@doctor.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
@@ -88,46 +88,7 @@
 
 
 
-<!-- Modal for Viewing Doctor's Schedules -->
-<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Doctor's Schedule</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Doctor's Name -->
-                <div class="mb-3">
-                    <h4 id="doctorName" class="fw-bold text-primary text-center"></h4>
-                </div>
-
-                <!-- Schedule Table -->
-                <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Available Day</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scheduleDetails">
-                        <!-- Schedule details will be dynamically inserted here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
-@* Modal for Adding new doctor *@
+@* Modal for Adding/Editing new doctor *@
 <div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -195,6 +156,43 @@
                     <button type="submit" class="btn btn-primary">Add Doctor</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal for Viewing Doctor's Schedules -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Doctor's Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Doctor's Name -->
+                <div class="mb-3">
+                    <h4 id="doctorName" class="fw-bold text-primary text-center"></h4>
+                </div>
+
+                <!-- Schedule Table -->
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Available Day</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleDetails">
+                        <!-- Schedule details will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>

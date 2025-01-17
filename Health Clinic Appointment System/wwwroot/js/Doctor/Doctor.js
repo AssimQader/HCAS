@@ -1,6 +1,6 @@
 ﻿
-
-(function () {
+(function ()
+{
     'use strict';
 
     // Validation rules and messages
@@ -15,6 +15,8 @@
         },
     };
 
+    let currentDoctorId = null; //track the current doctor being edited in edit process
+
 
 
     /**
@@ -25,7 +27,8 @@
         const feedbackDiv = input.nextElementSibling;
         const validationRule = regexMap[input.id];
 
-        if (validationRule) {
+        if (validationRule)
+        {
             if (validationRule.regex.test(input.value)) {
                 if (input.id === "PhoneNumber") {
                     const exists = await checkPhoneExists(input.value, feedbackDiv);
@@ -63,11 +66,13 @@
      * @returns {boolean} - Returns true if the phone number exists, otherwise false.
      */
     const checkPhoneExists = async (phoneNumber, feedbackDiv) => {
-        try {
+        try
+        {
             const response = await fetch(`/Doctor/CheckPhoneExists?phoneNum=${encodeURIComponent(phoneNumber)}`);
             const result = await response.json();
 
-            if (result.exists) {
+            if (result.exists && (!currentDoctorId || result.doctorID !== parseInt(currentDoctorId)))
+            {
                 feedbackDiv.textContent = "A user with this phone number already exists!";
                 feedbackDiv.style.display = "block";
                 return true;
@@ -137,8 +142,55 @@
         }
     });
 
+
     // Add a new schedule row on button click
     document.getElementById("addScheduleBtn").addEventListener("click", addScheduleRow);
+
+
+
+    // Handle populating the modal for editing a doctor.
+    document.querySelectorAll(".edit-doctor-btn").forEach(button => {
+        button.addEventListener("click", async function () {
+            currentDoctorId = this.getAttribute("data-id");
+
+            try
+            {
+                const response = await fetch(`/Doctor/Edit?id=${currentDoctorId}`);
+                const doc = await response.json();
+
+                if (response.ok && doc)
+                {
+                    document.getElementById("FullName").value = doc.fullName || "";
+                    document.getElementById("Email").value = doc.email || "";
+                    document.getElementById("PhoneNumber").value = doc.phoneNumber || "";
+                    document.getElementById("Specialization").value = doc.specialization || "";
+
+                    //update modal title and submit button texts
+                    document.getElementById("addDoctorModalLabel").textContent = "Edit Doctor";
+                    document.querySelector("#addDoctorForm button[type='submit']").textContent = "Save Changes";
+
+                    const modal = new bootstrap.Modal(document.getElementById("addDoctorModal"));
+                    modal.show();
+                }
+                else
+                {
+                    throw new Error("Failed to fetch doctor data!");
+                }
+            }
+            catch (error)
+            {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: "An error occurred while fetching doctor data!",
+                    confirmButtonText: "OK",
+                });
+                console.error("Error fetching doctor data:", error);
+            }
+        });
+    });
+
+
 
 
     // Real-time validation for all inputs
@@ -147,8 +199,6 @@
         input.addEventListener("blur", () => validateInput(input));
     });
 })();
-
-
 
 
 
@@ -206,10 +256,32 @@ $(document).on("click", ".view-schedule-btn", async function ()
 
 // Form submission handler
 document.getElementById("addDoctorForm").addEventListener("submit", async function (event) {
-    event.preventDefault();
+    let isFormValid = true;
+
+    inputs.forEach((input) => {
+        validateInput(input);
+
+        if (!input.classList.contains("is-valid")) {
+            isFormValid = false;
+        }
+    });
+
+    if (!isFormValid || !form.checkValidity())
+    {
+        event.preventDefault(); //prevent form submission
+        event.stopPropagation();
+        return;
+    }
+
+    form.classList.add('was-validated');
 
     const form = this;
     const formData = new FormData(form);
+
+    if (currentDoctorId) //if it has a value that means user in EDIT proccess
+    {
+        formData.append("ID", currentDoctorId); //append the ID to send with doctor object to database
+    }
 
     // Collect all schedules data
     document.querySelectorAll("#scheduleContainer .row").forEach((row, index) => {
@@ -232,31 +304,53 @@ document.getElementById("addDoctorForm").addEventListener("submit", async functi
     });
 
     try {
-        const response = await fetch("/Doctor/Create", {
+        const url = currentDoctorId ? `/Doctor/Edit` : `/Doctor/Create`;
+        const response = await fetch(url, {
             method: "POST",
-            body: formData,
+            body: formData
         });
+
         const result = await response.json();
 
-        if (result.success) {
-            Swal.fire("Success!", "Doctor added successfully!", "success").then(() => {
+        if (result.success)
+        {
+            Swal.fire({
+                icon: "success!",
+                title: "Success!",
+                text: result.message,
+                confirmButtonText: "OK",
+            }).then(() => {
                 form.reset();
+                currentDoctorId = null; //reset currentDoctorId
                 document.getElementById("addDoctorModal").click();
                 location.reload();
             });
-        } else {
-            Swal.fire("Error!", result.message, "error");
+
         }
-    } catch (error) {
-        Swal.fire("Error!", "An unexpected error occurred!", "error");
-        console.error(error);
+        else {
+            Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: result.message,
+                confirmButtonText: "OK",
+            });
+        }
+    }
+    catch (error)
+    {
+        Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "An unexpected error occurred!",
+            confirmButtonText: "OK",
+        });
+        console.error("Error:", error);
     }
 });
 
 
 
-
-
+// Delete Doctor logic
 document.addEventListener("DOMContentLoaded", function () {
     const deleteButtons = document.querySelectorAll(".delete-doctor-btn");
 
@@ -311,4 +405,21 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+});
+
+
+
+document.getElementById('addDoctorModal').addEventListener('hidden.bs.modal', function () {
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
+    }
+
+    document.activeElement.blur();
+
+    //reset the modal content
+    const form = document.getElementById('addDoctorForm');
+    form.reset();
+    form.classList.remove('was-validated');
+    document.getElementById('addDoctorModalLabel').textContent = 'Add New Doctor';
 });

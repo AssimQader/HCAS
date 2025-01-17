@@ -80,7 +80,7 @@ namespace HCAS.Services.DoctorServices
             }
         }
 
-        public async Task<bool> AddDoctor(DoctorDto doctorDto)
+        public async Task<int> AddDoctor(DoctorDto doctorDto)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace HCAS.Services.DoctorServices
                 Doctor doctor = Mapper.Map(doctorDto);
                 await _dbContext.Doctors.AddAsync(doctor);
                 int affectedRows = await _dbContext.SaveChangesAsync();
-                return affectedRows > 0;
+                return doctor.ID;
             }
             catch (Exception ex)
             {
@@ -186,20 +186,6 @@ namespace HCAS.Services.DoctorServices
         }
 
 
-        public async Task<bool> IsPhoneNumberExists(string phoneNumber)
-        {
-            try
-            {
-                bool result = await _dbContext.Doctors.AnyAsync(d => d.PhoneNumber == phoneNumber);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new ApplicationException($"Error checking phone number existence: {ex.Message}", ex);
-            }
-        }
-
-
         public async Task<List<DoctorScheduleDto>> GetDocScheduleByDocId(int doctorId)
         {
             try
@@ -245,7 +231,22 @@ namespace HCAS.Services.DoctorServices
         }
 
 
+        public async Task<int> GetDoctorIdByPhoneNumber(string phoneNumber)
+        {
+            try
+            {
+                var doctorId = await _dbContext.Doctors
+                    .Where(d => d.PhoneNumber == phoneNumber)
+                    .Select(d => d.ID)
+                    .FirstOrDefaultAsync();
 
+                return doctorId == 0 ? 0 : doctorId;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error fetching patient ID by phone number: {ex.Message}", ex);
+            }
+        }
 
     }
 }

@@ -12,12 +12,12 @@ namespace HCAS.Services.DoctorServices
         Task<List<DoctorDto>> GetAll();
         Task<List<DoctorDto>> GetAllWithSchedules();
         Task<DoctorDto> GetById(int id);
-        Task<bool> AddDoctor(DoctorDto doctorDto);
+        Task<int> AddDoctor(DoctorDto doctorDto);
         Task<bool> UpdateDoctor(DoctorDto doctorDto);
         Task<bool> DeleteDoctor(int id);
         Task<List<AppointmentDto>> GetAppointmentsByDoctorId(int doctorId);
         Task<List<PatientDto>> GetPatientsByDoctorId(int doctorId);
-        Task<bool> IsPhoneNumberExists(string phoneNum);
+        Task<int> GetDoctorIdByPhoneNumber(string phoneNumber);
         Task<List<DoctorScheduleDto>> GetDocScheduleByDocId(int doctorId);
         Task<List<DoctorDto>> GetDocBySpecialization(string specialization);
     }
