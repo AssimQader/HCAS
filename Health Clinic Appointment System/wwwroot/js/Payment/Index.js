@@ -72,7 +72,9 @@
                                         <span class="input-group-text">Fees</span>
                                         <input type="number" class="form-control fees-input" placeholder="Enter Amount" />
                                     </div>
-                                    <button class="btn btn-success w-100 pay-btn">Pay</button>
+                                     <button class="btn btn-success w-100 pay-btn" ${appointment.paymentStatus === "Paid" ? "disabled" : ""}>
+                                        Pay
+                                    </button>
                                 </div>
                             </div>
                         `;
