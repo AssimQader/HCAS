@@ -139,10 +139,6 @@ namespace HCAS.Services.DoctorServices
 
                 // 1. Add new schedules that are not in the existing list
                 var schedulesToAdd = incomingSchedules
-                    .Where(dto => !existingSchedules.Any(existing =>
-                        existing.DayOfWeek == dto.DayOfWeek &&
-                        existing.StartTime == TimeSpan.Parse(dto.StartTime) &&
-                        existing.EndTime == TimeSpan.Parse(dto.EndTime)))
                     .Select(dto => new DoctorSchedule
                     {
                         DayOfWeek = dto.DayOfWeek,

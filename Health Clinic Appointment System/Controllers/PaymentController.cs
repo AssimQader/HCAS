@@ -3,10 +3,12 @@ using HCAS.DTO;
 using HCAS.Services.Mapperly;
 using HCAS.Services.PaymentServices;
 using Health_Clinic_Appointment_System.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Health_Clinic_Appointment_System.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class PaymentController : Controller
     {
         private readonly IPaymentServices _paymentService;
@@ -44,13 +46,6 @@ namespace Health_Clinic_Appointment_System.Controllers
             {
                 throw;
             }
-        }
-
-
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
         }
 
 
@@ -104,6 +99,7 @@ namespace Health_Clinic_Appointment_System.Controllers
             }
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Edit(PaymentDto paymentDto)
         {
@@ -120,6 +116,7 @@ namespace Health_Clinic_Appointment_System.Controllers
                 throw;
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
@@ -172,41 +169,5 @@ namespace Health_Clinic_Appointment_System.Controllers
             }
         }
 
-
-        [HttpGet]
-        public async Task<IActionResult> GetPaymentByAppointmentId(int id)
-        {
-            try
-            {
-                List<PaymentDto> payments = await _paymentService.GetPaymentDetailsData();
-                List<PaymentViewModel> paymentDetails = [];
-
-                foreach (PaymentDto payment in payments)
-                {
-                    paymentDetails.Add(new PaymentViewModel()
-                    {
-                        PatientName = payment.Patient.FullName,
-                        PatientPhoneNumber = payment.Patient.PhoneNumber,
-                        AppointmentStartDateTime = payment.Appointment.StartDateTime,
-                        AppointmentEndDateTime = payment.Appointment.EndDateTime,
-                        Amount = payment.Amount,
-                        PaymentDate = (DateTime)payment.PaymentDate,
-                        PaymentID = payment.ID,
-                        PaymentMethod = payment.PaymentMethod
-                    });
-                }
-
-                return Json(new
-                {
-                    success = true,
-                    paymentData = paymentDetails
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"An unexpected error occurred: {ex.Message}" });
-                throw;
-            }
-        }
     }
 }

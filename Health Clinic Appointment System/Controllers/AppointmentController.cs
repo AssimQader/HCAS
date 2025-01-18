@@ -2,10 +2,12 @@
 using HCAS.DTO;
 using HCAS.Services.AppointmentServices;
 using Health_Clinic_Appointment_System.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Health_Clinic_Appointment_System.Controllers
 {
+    [Authorize(Roles = "Admin")] //only users with the "Admin" role can access this controller
     public class AppointmentController : Controller
     {
         private readonly IAppointmentServices _appointmentService;

@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using Health_Clinic_Appointment_System.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Health_Clinic_Appointment_System.Controllers
 {
+    [Authorize(Roles = "Admin")] //only users with the "Admin" role can access this controller
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

@@ -278,7 +278,8 @@
 
         // Collect all schedules data
         const scheduleRows = document.querySelectorAll("#scheduleContainer .row");
-        if (scheduleRows.length !== 0) {
+        if (scheduleRows.length !== 0)
+        {
             scheduleRows.forEach((row, index) => {
                 const DayOfWeek = row.querySelector(".schedule-day").value;
                 const StartTime = row.querySelector(".schedule-start-time").value + ":00"; // Ensure hh:mm:ss format

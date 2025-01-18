@@ -201,13 +201,20 @@ namespace HCAS.Services.AppointmentServices
             try
             {
                 return await _dbContext.Appointments.AnyAsync(app =>
-                    app.DoctorID == doctorId && app.StartDateTime == startDateTime && app.EndDateTime == endDateTime);  
+                    app.DoctorID == doctorId &&
+                    app.StartDateTime.Date == startDateTime.Date && // Ensure it's the same date
+                    (
+                        (startDateTime.TimeOfDay >= app.StartDateTime.TimeOfDay && startDateTime.TimeOfDay < app.EndDateTime.TimeOfDay) || // Overlaps at the start
+                        (endDateTime.TimeOfDay > app.StartDateTime.TimeOfDay && endDateTime.TimeOfDay <= app.EndDateTime.TimeOfDay) ||   // Overlaps at the end
+                        (startDateTime.TimeOfDay <= app.StartDateTime.TimeOfDay && endDateTime.TimeOfDay >= app.EndDateTime.TimeOfDay)  // Fully contains an existing appointment
+                    ));
             }
             catch (Exception ex)
             {
                 throw new ApplicationException("Error while checking for overlapping appointments.", ex);
             }
         }
+
 
 
     }
