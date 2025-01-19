@@ -134,6 +134,8 @@ $("#goCustomCalenderDateBtn").on("click", function () {
 
 
 var calendar;
+let startDateTime;
+let endDateTime;
 document.addEventListener('DOMContentLoaded', function ()
 {
     const specializationSelect = document.getElementById("Specialization");
@@ -149,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function ()
     startTimeInput.disabled = true;
     endTimeInput.disabled = true;
 
-    // Utility function to show error messages
+
     const showError = (message) => {
         errorMessageDiv.textContent = message;
         errorMessageDiv.style.display = "block";
@@ -159,6 +161,8 @@ document.addEventListener('DOMContentLoaded', function ()
         errorMessageDiv.textContent = "";
         errorMessageDiv.style.display = "none";
     };
+
+
 
     // Fetch doctors based on specialization
     specializationSelect.addEventListener("change", async function () {
@@ -179,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function ()
             showError("Error fetching doctors.");
         }
     });
+
 
     let DayName = '';
     // Handle date selection
@@ -216,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function ()
     // Handle "Add" button click
     submitBtn.addEventListener("click", async function ()
     {
-        const doctorId = doctorSelect.value;
+        let doctorId = doctorSelect.value;
         const doctorName = doctorSelect.options[doctorSelect.selectedIndex]?.text;
         const selectedDate = dateInput.value;
         const startTime = startTimeInput.value;
@@ -226,20 +231,6 @@ document.addEventListener('DOMContentLoaded', function ()
             showError("Please fill in all required fields!");
             return;
         }
-
-        // Convert startTime and endTime to 24-hour format
-        const convertTo24Hour = (time12h) => {
-            const [time, modifier] = time12h.split(' ');
-            let [hours, minutes] = time.split(':').map(Number);
-
-            if (modifier === 'PM' && hours < 12) {
-                hours += 12;
-            } else if (modifier === 'AM' && hours === 12) {
-                hours = 0;
-            }
-
-            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-        };
 
         const formattedStartTime = convertTo24Hour(startTime) + ":00";
         const formattedEndTime = convertTo24Hour(endTime) + ":00";
@@ -251,13 +242,13 @@ document.addEventListener('DOMContentLoaded', function ()
             const slotResult = await slotResponse.json();
 
             if (!slotResult.exists) {
-                showError(`Dr. ${doctorName} is not available within the selected time period: from ${startTime} to ${endTime} ! Please re-check the Schedule.`);
+                showError(`Dr. ${doctorName} is not available within the selected time period: ${startTime} - ${endTime} at ${DayName}!  Please re-check the Schedule.`);
                 return;
             }
 
             // 2- Check if the appointment already exists
-            const startDateTime = `${selectedDate} ${formattedStartTime}.0000000`;
-            const endDateTime = `${selectedDate} ${formattedEndTime}.0000000`;
+            startDateTime = `${selectedDate} ${formattedStartTime}.0000000`;
+            endDateTime = `${selectedDate} ${formattedEndTime}.0000000`;
 
             const appointmentResponse = await fetch(`/Appointment/IsExists?docId=${doctorId}&sdt=${startDateTime}&edt=${endDateTime}`);
             const appointmentResult = await appointmentResponse.json();
@@ -281,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function ()
             appointmentFormData.append("PaymentStatus", "Pending");
             
 
-            await SavePatientToDB(appointmentFormData);
+            await SavePatientAndAppointmentToDB(appointmentFormData);
         }
         catch (error) {
             showError("An error occurred while checking the appointment.");
@@ -343,17 +334,6 @@ document.addEventListener('DOMContentLoaded', function ()
     });
 
 
-    // Function to format time in 12-hour format with AM/PM
-    function formatTimeTo12Hour(dateTime)
-    {
-        const date = new Date(dateTime);
-        let hours = date.getHours();
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12; //convert 0 to 12 for 12-hour format
-        return `${hours}:${minutes} ${ampm}`;
-    }
-
     //function to fetch and render appointments on the calendar
     async function renderCalendar() {
         try
@@ -400,89 +380,119 @@ document.addEventListener('DOMContentLoaded', function ()
 
 
 
-async function SavePatientToDB(appointmentFormData)
+// Function to format time in 12-hour format with AM/PM
+function formatTimeTo12Hour(dateTime) {
+    const date = new Date(dateTime);
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; //convert 0 to 12 for 12-hour format
+    return `${hours}:${minutes} ${ampm}`;
+}
+
+
+
+//save appointment to databse (Add NEw & Edit)
+async function SavePatientAndAppointmentToDB(appointmentFormData)
 {
     const form = document.getElementById("addPatientForm");
     const formData = new FormData(form);
 
-    try {
-        //send the form data to the server using Fetch API
-        const PatientResponse = await fetch("/Patient/Create", {
-            method: "POST",
-            body: formData
-        });
-
-        const PatientResult = await PatientResponse.json();
-
-        if (PatientResult.success)
+    try
+    {
+        if (_AppointmentID === 0) //means it is add new appointmnt process
         {
-            let patientId = PatientResult.id;
-            appointmentFormData.append("PatientID", parseInt(patientId));
-
-            const AppointmentResponse = await fetch("/Appointment/Create", {
+            const PatientResponse = await fetch("/Patient/Create", {
                 method: "POST",
-                body: appointmentFormData,
+                body: formData,
             });
 
-            AppointmentResult = await AppointmentResponse.json();
+            const PatientResult = await PatientResponse.json();
 
-            if (AppointmentResult.success)
-            {
-                // Show success alert
-                Swal.fire({
-                    icon: "success",
-                    title: "Success!",
-                    text: AppointmentResult.message,
-                    confirmButtonText: "OK",
-                }).then(() => {
-                    //reload the page, reset the form and close the modal
-                    form.reset();
-                    clearAndCloseAppointmentForm();
-                    location.reload();
+            if (PatientResult.success) {
+                let patientId = PatientResult.id;
+                appointmentFormData.append("PatientID", parseInt(patientId));
 
-
-                    ////display event on the calender:
-                    //var startEvent = appointmentFormData["StartDateTime"];
-                    //var endEvent = appointmentFormData["EndDateTime"];
-
-                    //var evId = 1
-                    //calendar.addEvent({
-                    //    id: evId,
-                    //    title: 'Appointment Title',
-                    //    start: startEvent,
-                    //    end: endEvent,
-                    //    allDay: false
-                    //});
-
-                    ////// Store the event in local storage
-                    ////const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
-                    ////storedEvents.push({ title: sceneTitleInput, start: startEvent, end: endEvent });
-                    ////localStorage.setItem('events', JSON.stringify(storedEvents));
+                const AppointmentResponse = await fetch("/Appointment/Create", {
+                    method: "POST",
+                    body: appointmentFormData,
                 });
-            }
-            else {
-                // Show error alert
+
+                const AppointmentResult = await AppointmentResponse.json();
+
+                if (AppointmentResult.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success!",
+                        text: AppointmentResult.message,
+                        confirmButtonText: "OK",
+                    }).then(() => {
+                        // Reset form, close modal, and reload page
+                        form.reset();
+                        clearAndCloseAppointmentForm();
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: AppointmentResult.message,
+                        confirmButtonText: "OK",
+                    });
+                }
+            } else {
                 Swal.fire({
                     icon: "error",
                     title: "Error!",
-                    text: AppointmentResult.message,
+                    text: PatientResult.message,
                     confirmButtonText: "OK",
                 });
             }
-           
         }
-        else
+        else  // If _AppointmentID !== 0, update the existing appointment
         {
-            // Show error alert
-            Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: PatientResult.message,
-                confirmButtonText: "OK",
+           
+            const updateFormData = new FormData();
+            updateFormData.append("ID", parseInt(_AppointmentID));
+            updateFormData.append("PatientID", _PatientID);
+
+            //get the DoctorID from the selected option in DoctorsList
+            const selectedDoctorId = document.getElementById("DoctorsList").value;
+            updateFormData.append("DoctorID", parseInt(selectedDoctorId));
+
+            updateFormData.append("StartDateTime", startDateTime);
+            updateFormData.append("EndDateTime", endDateTime);
+            updateFormData.append("Status", "Confirmed");
+            updateFormData.append("PaymentStatus", "Pending");
+
+            const UpdateResponse = await fetch("/Appointment/Edit", {
+                method: "POST",
+                body: updateFormData,
             });
+
+            const UpdateResult = await UpdateResponse.json();
+
+            if (UpdateResult.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: UpdateResult.message,
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    form.reset();
+                    clearAndCloseAppointmentForm();
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: UpdateResult.message,
+                    confirmButtonText: "OK",
+                });
+            }
         }
-    }
-    catch (error) {
+    } catch (error) {
         Swal.fire({
             icon: "error",
             title: "Error!",
@@ -492,6 +502,7 @@ async function SavePatientToDB(appointmentFormData)
         console.error("Error:", error);
     }
 }
+
 
 /*------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------*/
@@ -514,14 +525,110 @@ $("input[type=radio][name=viewOption-radio]").on("change", function () {
 
 
 
-//show create appointment card when click on Add New.
-function showHideAddEventForm()
+
+
+let _AppointmentID = 0;
+let _PatientID = 0;
+let _DoctorID = 0;
+//show create/edit appointment card when click on Add New or Edit buttons.
+function showHideAddEventForm(appointmentId)
 {
-    if ($('#addAppointmentForm').is(':hidden'))
+    _AppointmentID = appointmentId;
+    if (appointmentId === 0)
     {
+        document.getElementById("submitBtn").textContent = "Add";
+
+        $('#FullName').prop('disabled', false);
+        $('#Email').prop('disabled', false);
+        $('#PhoneNumber').prop('disabled', false);
+        $('#Gender').prop('disabled', false);
+
+        // Clear the form for creating a new appointment
+        $('#Specialization').val('');
+        $('#DoctorsList').empty().append('<option value="" selected disabled>Select Doctor</option>');
+        $('#Date').val('');
+        $('#StartTime').val('');
+        $('#EndTime').val('');
+        $('#FullName').val('');
+        $('#Email').val('');
+        $('#PhoneNumber').val('');
+        $('#Gender').val('');
+    }
+    else
+    {
+        document.getElementById("submitBtn").textContent = "Save Changes";
+        // Fetch appointment details and populate the form
+        fetch(`/Appointment/Edit?id=${appointmentId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch appointment data.');
+                }
+                return response.json();
+            })
+            .then(responseData => {
+                if (!responseData.success) {
+                    throw new Error('Appointment not found or an error occurred.');
+                }
+
+                const data = responseData.data;
+
+                _PatientID = data.patientID;
+                _DoctorID = data.doctorID;
+
+                // Populate the form fields with fetched data
+                $('#Specialization').val(data.doctor.specialization);
+                $('#DoctorsList').empty().append(`<option value="${data.doctor.id}" selected>${data.doctor.fullName}</option>`);
+                $('#Date').val(data.startDateTime.split('T')[0]); // Extract the date in YYYY-MM-DD format
+                $('#StartTime').val(formatTimeTo24Hour(data.startDateTime)); // Format time to HH:mm
+                $('#EndTime').val(formatTimeTo24Hour(data.endDateTime)); // Format time to HH:mm
+
+                $('#FullName').val(data.patient.fullName).prop('disabled', true);
+                $('#Email').val(data.patient.email).prop('disabled', true);
+                $('#PhoneNumber').val(data.patient.phoneNumber).prop('disabled', true);
+                $('#Gender').val(data.patient.gender).prop('disabled', true);
+            })
+            .catch(error => {
+                console.error('Error fetching appointment data:', error);
+                alert('Failed to fetch appointment data. Please try again.');
+            });
+
+
+    }
+
+    if ($('#addAppointmentForm').is(':hidden')) {
         $("#addAppointmentForm").show();
     }
 }
+
+
+
+
+
+
+// Function to format time in 24-hour format
+function formatTimeTo24Hour(dateTime) {
+    const date = new Date(dateTime);
+    const hours = String(date.getHours()).padStart(2, '0'); // Ensure 2-digit hours
+    const minutes = String(date.getMinutes()).padStart(2, '0'); // Ensure 2-digit minutes
+    return `${hours}:${minutes}`;
+}
+
+
+// Convert startTime and endTime to 24-hour format
+const convertTo24Hour = (time12h) => {
+    const [time, modifier] = time12h.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+
+    if (modifier === 'PM' && hours < 12) {
+        hours += 12;
+    } else if (modifier === 'AM' && hours === 12) {
+        hours = 0;
+    }
+
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+};
+
+
 
 
 
@@ -539,5 +646,65 @@ function clearAndCloseAppointmentForm() {
 
 /*---------------------------------------------------------------------------------*/
 
+// Delete Appointment logic
+document.addEventListener("DOMContentLoaded", function ()
+{
+    const deleteButtons = document.querySelectorAll(".delete-appointment-btn");
 
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", async function () {
+            const appointmentId = this.getAttribute("data-id");
+
+            const confirmation = await Swal.fire({
+                title: "Are you sure?",
+                text: "You are about to remove this appointment.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: "Cancel",
+            });
+
+            if (confirmation.isConfirmed)
+            {
+                try
+                {
+                    const response = await fetch(`/Appointment/Delete?id=${appointmentId}`, {
+                        method: "GET",
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        await Swal.fire({
+                            title: "Deleted!",
+                            text: result.message,
+                            icon: "success",
+                            confirmButtonText: "OK",
+                        });
+
+                        location.reload();
+                    }
+                    else
+                    {
+                        Swal.fire({
+                            title: "Error!",
+                            text: result.message,
+                            icon: "error",
+                            confirmButtonText: "OK",
+                        });
+                    }
+                }
+                catch (error)
+                {
+                    Swal.fire({
+                        title: "Error!",
+                        text: "An unexpected error occurred while trying to delete the appointment!",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+            }
+        });
+    });
+});
 

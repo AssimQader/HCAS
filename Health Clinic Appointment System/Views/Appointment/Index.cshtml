@@ -47,7 +47,7 @@
                         <label id="CalenderView" class="btn btn-outline-secondary" for="viewAsCalender">Calender View</label>
                     </div>
                     &nbsp;
-                    <button id="btnGroupDrop1" type="button" onclick="showHideAddEventForm()" class="btn btn-primary btn-style-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button id="btnGroupDrop1" type="button" onclick="showHideAddEventForm(0)" class="btn btn-primary btn-style-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa-solid fa-plus"></i>
                         Add New
                     </button>
@@ -155,7 +155,6 @@
         </div>
     </div>
 </div>
-
 <!-- end: add new appointment -->
 
 
@@ -180,7 +179,7 @@
                         <th style="text-align: center;">Patient Name</th>
                         <th style="text-align: center;">Appointment Status</th>
                         <th style="text-align: center;">Payment Status</th>
-                        @* <th style="text-align: center;">Options</th> *@
+                        <th style="text-align: center;">Options</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -207,17 +206,14 @@
                             <td>
                                 @item.PaymentStatus
                             </td>
-                            @* <td>
-                                <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="ViewFullScreen" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="perview">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
-                                <a type="button" class="btn btn-sm" asp-controller="PatientController" asp-action="Edit" asp-route-Id="@item.ID" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                            <td>
+                                <a type="button" href="#" onclick="showHideAddEventForm(@item.AppointmentID)" class="btn btn-sm edit-doctor-btn" data-bs-toggle="dropdown" aria-expanded="false" title="Edit">
                                     <i class="fa-solid fa-pen fa-red"></i>
                                 </a>
-                                <a class="btn btn-sm" onclick="deleteTemplate(@item.ID)" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                <a class="btn btn-sm delete-appointment-btn" data-id="@item.AppointmentID" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
                                     <i class="fa-solid fa-trash" style="color:red;"></i>
                                 </a>
-                            </td> *@
+                            </td>
                         </tr>
                     }
                 </tbody>

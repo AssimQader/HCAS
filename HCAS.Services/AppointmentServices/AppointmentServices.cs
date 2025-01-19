@@ -50,6 +50,50 @@ namespace HCAS.Services.AppointmentServices
             }
         }
 
+
+
+        public async Task<AppointmentDto> GetAllDataById(int id)
+        {
+            try
+            {
+                AppointmentDto appointment =
+                    await _dbContext.Appointments
+                    .Where(a => a.ID == id)
+                    .Select(a => new AppointmentDto()
+                    {
+                        ID = a.ID,
+                        StartDateTime = a.StartDateTime,    
+                        EndDateTime = a.EndDateTime,
+                        PatientID = a.PatientID,
+                        Patient = new PatientDto()
+                        {
+                            FullName = a.Patient.FullName,
+                            Email = a.Patient.Email,
+                            Gender = a.Patient.Gender,
+                            PhoneNumber = a.Patient.PhoneNumber ,
+                            ID = a.ID,  
+                        },
+                        DoctorID = a.DoctorID,
+                        Doctor = new DoctorDto()
+                        {
+                            FullName = a.Doctor.FullName,
+                            Specialization = a.Doctor.Specialization,   
+                            ID = a.Doctor.ID,   
+                        }
+
+                    }).FirstOrDefaultAsync();
+               
+                return appointment == null
+                    ? throw new KeyNotFoundException($"Appointment with ID {id} not found.")
+                    : appointment;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException($"Error fetching appointment by ID {id}.", ex);
+            }
+        }
+
+
         public async Task<bool> AddAppointment(AppointmentDto appointmentDto)
         {
             try

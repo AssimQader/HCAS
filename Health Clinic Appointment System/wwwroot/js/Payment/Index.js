@@ -113,7 +113,7 @@
                                 }
 
                                 // Step 2: Update payment status in Appointment table
-                                const appointmentResponse = await fetch(`/Appointment/Edit?id=${appointmentId}`);
+                                const appointmentResponse = await fetch(`/Appointment/EditPayment?id=${appointmentId}`);
                                 if (!appointmentResponse.ok )
                                 {
                                     Swal.fire("Error", "Failed to update payment status in Appointments table!", "error");

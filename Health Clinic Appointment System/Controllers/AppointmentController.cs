@@ -79,7 +79,7 @@ namespace Health_Clinic_Appointment_System.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> EditPayment(int id)
         {
             try
             {
@@ -94,8 +94,6 @@ namespace Health_Clinic_Appointment_System.Controllers
                 }
 
                 appointment.PaymentStatus = "Paid";
-
-
                 bool result = await _appointmentService.UpdateAppointment(appointment);
                 if (result)
                 {
@@ -126,6 +124,39 @@ namespace Health_Clinic_Appointment_System.Controllers
 
 
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            try
+            {
+                AppointmentDto appointment = await _appointmentService.GetAllDataById(id);
+                
+                if (appointment == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        data = new AppointmentDto()
+                    });
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    data = appointment
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    data = new AppointmentDto()
+                });
+            }
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Edit(AppointmentDto appointmentDto)
         {
@@ -134,12 +165,29 @@ namespace Health_Clinic_Appointment_System.Controllers
 
             try
             {
-                await _appointmentService.UpdateAppointment(appointmentDto);
-                return RedirectToAction("Index");
+               bool result =  await _appointmentService.UpdateAppointment(appointmentDto);
+                if (result)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Appointment updated succesfully."
+                    });
+                }
+
+                return Json(new
+                {
+                    success = false,
+                    message = "Failed to update appointment!"
+                });
             }
             catch (Exception ex)
             {
-                throw;
+                return Json(new
+                {
+                    success = false,
+                    message = $"An unexpected error occurred: {ex.Message}"
+                });
             }
         }
 
@@ -148,12 +196,25 @@ namespace Health_Clinic_Appointment_System.Controllers
         {
             try
             {
-                await _appointmentService.DeleteAppointment(id);
-                return RedirectToAction("Index");
+                bool result = await _appointmentService.DeleteAppointment(id);
+                if (result)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Appointment removed successfully."
+                    });
+                }
+
+                return Json(new
+                {
+                    success = false,
+                    message = "An error occurred!"
+                });
             }
             catch (Exception ex)
             {
-                throw;
+                return Json(new { success = false, message = $"An error occurred: {ex.Message}" });
             }
         }
 

@@ -11,6 +11,7 @@ namespace HCAS.Services.AppointmentServices
     {
         Task<List<AppointmentDto>> GetAll();
         Task<AppointmentDto> GetById(int id);
+        Task<AppointmentDto> GetAllDataById(int id);
         Task<bool> AddAppointment(AppointmentDto appointmentDto);
         Task<bool> UpdateAppointment(AppointmentDto appointmentDto);
         Task<bool> DeleteAppointment(int id);
