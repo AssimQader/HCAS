@@ -13,6 +13,22 @@
     <link href="~/lib/dataTable/jquery.dataTables.css" rel="stylesheet" />
     <link href="~/lib/sweetalert2/sweetalert2.min.css" rel="stylesheet" />    
     <style>
+        .card {
+            border-radius: 9px;
+            transition: transform 0.2s ease-in-out;
+            background-color: lightgrey;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #timeSlotsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
     </style>
 
@@ -156,6 +172,24 @@
     </div>
 </div>
 <!-- end: add new appointment -->
+
+
+<!-- avilavle slots Schedule Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleModalLabel">Available Time Slots for the selected day</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="timeSlotsContainer" class="row g-2">
+                    <!-- Dynamic cards will be appended here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 

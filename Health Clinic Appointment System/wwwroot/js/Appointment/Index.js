@@ -152,15 +152,65 @@ document.addEventListener('DOMContentLoaded', function ()
     endTimeInput.disabled = true;
 
 
-    const showError = (message) => {
-        errorMessageDiv.textContent = message;
+    const showError = (message, availableSlots = []) => {
+        errorMessageDiv.innerHTML = `${message.replace(
+            "Schedule",
+            `<a href="#" id="openScheduleModal" data-bs-toggle="modal" data-bs-target="#scheduleModal">Schedule</a>`
+        )}`;
         errorMessageDiv.style.display = "block";
+
+        // Attach event to open modal and populate it with available slots
+        document.getElementById("openScheduleModal").addEventListener("click", () => {
+            populateScheduleModal(availableSlots);
+        });
     };
+
+
 
     const clearError = () => {
         errorMessageDiv.textContent = "";
         errorMessageDiv.style.display = "none";
     };
+
+
+
+    const populateScheduleModal = (availableSlots) =>
+    {
+        const timeSlotsContainer = document.getElementById("timeSlotsContainer");
+        timeSlotsContainer.innerHTML = "";
+
+        if (availableSlots.length === 0) {
+            timeSlotsContainer.innerHTML = `<p class="text-muted">No available slots for the selected date.</p>`;
+            return;
+        }
+
+        availableSlots.forEach((slot, index) => {
+            const card = document.createElement("div");
+            card.className = "col-md-4";
+            card.innerHTML = `
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h6 class="card-title text-primary">Slot ${index + 1}</h6>
+                    <p class="card-text">
+                        <strong>Start:</strong> ${slot.start}<br>
+                        <strong>End:</strong> ${slot.end}
+                    </p>
+                    <button class="btn btn-outline-primary btn-sm book-slot-btn" data-slot="${index}">
+                        Book Slot
+                    </button>
+                </div>
+            </div>
+        `;
+
+            // Add click event to book a slot
+            card.querySelector(".book-slot-btn").addEventListener("click", () => {
+                alert(`Slot booked: ${slot.start} - ${slot.end}`);
+            });
+
+            timeSlotsContainer.appendChild(card);
+        });
+    };
+
 
 
 
@@ -242,9 +292,16 @@ document.addEventListener('DOMContentLoaded', function ()
             const slotResult = await slotResponse.json();
 
             if (!slotResult.exists) {
-                showError(`Dr. ${doctorName} is not available within the selected time period: ${startTime} - ${endTime} at ${DayName}!  Please re-check the Schedule.`);
+                showError(`Dr. ${doctorName} is not available within the selected time period: ${startTime} - ${endTime} at ${DayName}!  Please re-check the Schedule.`,
+                    [
+                        { "start": "09:00 PM", "end": "09:30 PM" },
+                        { "start": "09:30 PM", "end": "10:00 PM" },
+                        { "start": "10:00 PM", "end": "10:30 PM" },
+                        { "start": "10:30 PM", "end": "11:30 PM" },
+                    ]);
                 return;
             }
+
 
             // 2- Check if the appointment already exists
             startDateTime = `${selectedDate} ${formattedStartTime}.0000000`;
